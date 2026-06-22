@@ -4,31 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 
 class PostController extends Controller
 {
-    /*
-     * Display a listing of the resource.
-     */
+    protected function authorizePostAccess(Post $post): void
+    {
+        $user = Auth::user();
+
+        abort_unless(
+            $user && ($user->id === $post->user_id || $user->isAdmin()),
+            403
+        );
+    }
+
     public function index()
     {
-        $posts = Post::all(); // напрямую из БД, без Redis
-        return view("posts.index", compact("posts"));
+        $posts = Post::latest()->paginate(8);
+        return view('posts.index', compact('posts'));
     }
 
-
-    /*
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view("posts.create");
+        return view('posts.create');
     }
 
-    /*
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -44,37 +45,64 @@ class PostController extends Controller
             $data['image'] = $path;
         }
 
+        $data['user_id'] = Auth::id();
+
         Post::create($data);
+        Redis::del('post:all');
 
-        // Очистка кэша после создания
-        Redis::del("post:all");
-
-        return redirect()->route('posts.index');
+        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
 
-
-    /*
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $views = Redis::incr("post:{$id}:views");
-        $post = Post::with('comments')->findOrFail($id);
-        return view('posts.show', compact('post', 'views'));
+        $post = Post::with(['user', 'comments.user'])->findOrFail($id);
+        $likes = (int) Redis::get("post:{$id}:likes");
+        $likedPosts = session('liked_posts', []);
+        $isLiked = in_array((int) $id, $likedPosts, true);
+
+        return view('posts.show', compact('post', 'views', 'likes', 'isLiked'));
     }
 
-    /*
-     * Show the form for editing the specified resource.
-     */
+    public function toggleLike(string $id)
+    {
+        $post = Post::findOrFail($id);
+        $likedPosts = session('liked_posts', []);
+        $postId = (int) $post->id;
+        $liked = false;
+
+        if (in_array($postId, $likedPosts, true)) {
+            $likedPosts = array_values(array_filter($likedPosts, fn ($likedId) => (int) $likedId !== $postId));
+            Redis::decr("post:{$postId}:likes");
+        } else {
+            $likedPosts[] = $postId;
+            $likedPosts = array_values(array_unique($likedPosts));
+            Redis::incr("post:{$postId}:likes");
+            $liked = true;
+        }
+
+        session(['liked_posts' => $likedPosts]);
+
+        $likes = max(0, (int) Redis::get("post:{$postId}:likes"));
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'liked' => $liked,
+                'likes' => $likes,
+            ]);
+        }
+
+        return back();
+    }
+
     public function edit(string $id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+        $this->authorizePostAccess($post);
+
         return view('posts.edit', compact('post'));
     }
 
-    /*
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -84,42 +112,30 @@ class PostController extends Controller
         ]);
 
         $post = Post::findOrFail($id);
-
+        $this->authorizePostAccess($post);
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            // сохраняем новый файл
             $path = $request->file('image')->store('posts', 'public');
             $data['image'] = $path;
         } else {
-            // если файл не загружен, оставляем старую картинку
             $data['image'] = $post->image;
         }
 
         $post->update($data);
+        Redis::del('post:all');
 
-        // очищаем кэш Redis, если используешь
-        Redis::del("post:all");
-
-        return redirect()->route('posts.index');
+        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+        $this->authorizePostAccess($post);
 
-        if ($post) {
-            $post->delete();
-            Redis::del("post:all"); // вот это оставляем
-            return redirect()->route('posts.index')->with('success', 'Пост удалён!');
-        }
+        $post->delete();
+        Redis::del('post:all');
 
-        return redirect()->route('posts.index')->with('error', 'Пост не найден!');
+        return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }
-
-
-
 }

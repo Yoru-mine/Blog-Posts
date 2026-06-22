@@ -1,179 +1,308 @@
 @extends('layouts.app')
 
-@section('title', 'Редактировать пост')
+@section('title', 'Edit post')
 
 @section('content')
     <style>
-        /* Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-        body {
-            background-color: #3e2f2f;
-            font-family: 'Montserrat', sans-serif;
-            color: #d9d9c3;
+        .edit-page {
             min-height: 100vh;
+            padding: 132px 24px 72px;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 22%),
+                radial-gradient(circle at right center, rgba(255, 220, 220, 0.08), transparent 22%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 32%);
+        }
+
+        .edit-shell {
+            max-width: 1220px;
+            margin: 0 auto;
+            display: grid;
+            gap: 28px;
+        }
+
+        .edit-hero {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 26px;
+            padding: 38px;
+            background: rgba(28, 28, 28, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .edit-kicker {
+            display: inline-block;
+            margin-bottom: 18px;
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .edit-title {
+            margin: 0 0 16px;
+            font-size: 52px;
+            line-height: 1.03;
+        }
+
+        .edit-copy {
+            max-width: 680px;
             margin: 0;
-            padding: 0;
+            font-size: 17px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.78);
         }
 
-        .edit-container {
-            max-width: 600px;
-            margin: 3rem auto 5rem;
-            background-color: #4a5a4a;
-            border-radius: 15px;
-            box-shadow:
-                5px 5px 15px #2a3a2a,
-                -5px -5px 15px #5a7a5a;
-            padding: 2rem 2.5rem;
-            color: #d9d9c3;
-            animation: fadeIn 0.6s ease-in-out forwards;
-            user-select: none;
+        .edit-preview {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 18px;
+            display: grid;
+            align-content: start;
+            gap: 14px;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: #f0e6e6;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 6px rgba(62, 47, 47, 0.8);
-            user-select: none;
+        .edit-preview-label {
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.52);
         }
 
-        form label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #cfcfc3;
-            user-select: text;
-        }
-
-        input[type="text"],
-        textarea,
-        input[type="file"] {
+        .edit-preview-image {
             width: 100%;
-            padding: 0.6rem 1rem;
-            border-radius: 15px;
-            border: none;
-            background: #3a5a3a;
-            color: #d9d9c3;
-            font-size: 1rem;
-            box-shadow:
-                inset 3px 3px 6px #2a3a2a,
-                inset -3px -3px 6px #5a7a5a;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-            resize: vertical;
-            user-select: text;
-        }
-
-        input[type="text"]:focus,
-        textarea:focus,
-        input[type="file"]:focus {
-            outline: none;
-            background: #4a6a4a;
-            box-shadow:
-                inset 3px 3px 8px #3a7a3a,
-                inset -3px -3px 8px #6a8a6a;
-        }
-
-        textarea {
-            min-height: 120px;
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #b07a4a, #9e6e4a);
-            color: #f0e6e6;
-            font-weight: 700;
-            border: none;
-            border-radius: 30px;
-            padding: 0.7rem 2.2rem;
-            cursor: pointer;
-            box-shadow:
-                0 4px 15px rgba(176, 122, 74, 0.6),
-                inset 0 -2px 5px rgba(255, 255, 255, 0.2);
-            transition:
-                background 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 260px;
+            object-fit: cover;
             display: block;
-            margin: 2rem auto 0;
-            user-select: none;
-            position: relative;
-            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .btn-warning::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -25%;
-            width: 150%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.15);
-            transform: rotate(25deg);
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
+        .edit-preview-note {
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .btn-warning:hover,
-        .btn-warning:focus {
-            background: linear-gradient(135deg, #d09e6a, #be8e6a);
-            box-shadow:
-                0 6px 20px rgba(208, 158, 106, 0.9),
-                inset 0 -3px 7px rgba(255, 255, 255, 0.3);
-            transform: translateY(-4px) scale(1.05);
+        .edit-card {
+            padding: 32px;
+            background: rgba(30, 30, 30, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .edit-form {
+            display: grid;
+            gap: 22px;
+        }
+
+        .edit-field {
+            display: grid;
+            gap: 10px;
+        }
+
+        .edit-label {
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.56);
+        }
+
+        .edit-input,
+        .edit-textarea,
+        .edit-file {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(20, 20, 20, 0.62);
+            color: #f5f5f5;
+            font-size: 16px;
+            font-family: inherit;
             outline: none;
+            transition: border-color 0.2s ease, background 0.2s ease;
         }
 
-        .btn-warning:hover::before,
-        .btn-warning:focus::before {
-            transform: rotate(25deg) translateX(100%);
+        .edit-input,
+        .edit-file {
+            min-height: 58px;
+            padding: 0 18px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+        .edit-textarea {
+            min-height: 220px;
+            padding: 16px 18px;
+            resize: vertical;
+            line-height: 1.75;
+        }
+
+        .edit-input:focus,
+        .edit-textarea:focus,
+        .edit-file:focus {
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(24, 24, 24, 0.92);
+        }
+
+        .edit-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .edit-button,
+        .edit-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            padding: 0 22px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .edit-button {
+            background: #f2ede2;
+            color: #1E1E1E;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
+        }
+
+        .edit-link {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f4f4f4;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .edit-button:hover,
+        .edit-link:hover {
+            transform: translateY(-1px);
+            opacity: 0.96;
+        }
+
+        .edit-error {
+            font-size: 13px;
+            line-height: 1.55;
+            color: #efb3b3;
+        }
+
+        @media (max-width: 1024px) {
+            .edit-hero {
+                grid-template-columns: 1fr;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .edit-title {
+                font-size: 40px;
             }
         }
 
-        /* Responsive */
-        @media (max-width: 576px) {
-            .edit-container {
-                margin: 2rem 1rem 4rem;
-                padding: 1.5rem 1.5rem;
+        @media (max-width: 720px) {
+            .edit-page {
+                padding: 112px 14px 36px;
             }
 
-            h1 {
-                font-size: 2rem;
+            .edit-hero,
+            .edit-card {
+                padding: 22px 18px;
+            }
+
+            .edit-title {
+                font-size: 34px;
+            }
+
+            .edit-actions {
+                flex-direction: column;
+            }
+
+            .edit-button,
+            .edit-link {
+                width: 100%;
+            }
+
+            .edit-preview-image {
+                height: 210px;
             }
         }
     </style>
 
-    <div class="edit-container" role="main">
-        <h1>Редактировать пост</h1>
+    <div class="edit-page">
+        <div class="edit-shell">
+            <section class="edit-hero">
+                <div>
+                    <span class="edit-kicker">Edit workspace</span>
+                    <h1 class="edit-title">Edit your post</h1>
+                    <p class="edit-copy">
+                        Update the title, text, and visual mood of your post here. The layout stays in the same atmosphere as the rest of the project, so editing feels like part of the same world.
+                    </p>
+                </div>
 
-        <form method="POST" action="{{ route('posts.update', $post->id) }}" enctype="multipart/form-data" novalidate>
-            @csrf
-            @method('PUT')
+                <div class="edit-preview">
+                    <div class="edit-preview-label">Current image</div>
+                    <img
+                        src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                        alt="{{ $post->title }}"
+                        class="edit-preview-image"
+                    >
+                    <p class="edit-preview-note">
+                        This is the image currently attached to the post. You can upload a new one below if you want to change the visual.
+                    </p>
+                </div>
+            </section>
 
-            <label for="title">Заголовок</label>
-            <input type="text" name="title" id="title" value="{{ old('title', $post->title) }}" required
-                aria-required="true" placeholder="Введите заголовок">
+            <section class="edit-card">
+                <form method="POST" action="{{ route('posts.update', $post->id) }}" enctype="multipart/form-data" class="edit-form">
+                    @csrf
+                    @method('PUT')
 
-            <label for="content" class="mt-4">Содержимое</label>
-            <textarea name="content" id="content" rows="6" required aria-required="true" placeholder="Введите содержимое">{{ old('content', $post->content) }}</textarea>
+                    <div class="edit-field">
+                        <label for="title" class="edit-label">Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            class="edit-input"
+                            value="{{ old('title', $post->title) }}"
+                            required
+                        >
+                        @error('title')
+                            <div class="edit-error">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <label for="image" class="mt-4">Выберите изображение</label>
-            <input type="file" id="image" name="image" accept="image/*" aria-describedby="imageHelp">
+                    <div class="edit-field">
+                        <label for="content" class="edit-label">Content</label>
+                        <textarea
+                            name="content"
+                            id="content"
+                            class="edit-textarea"
+                            required
+                        >{{ old('content', $post->content) }}</textarea>
+                        @error('content')
+                            <div class="edit-error">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <button type="submit" class="btn-warning" aria-label="Обновить пост">Обновить</button>
-        </form>
+                    <div class="edit-field">
+                        <label for="image" class="edit-label">Replace image</label>
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept="image/*"
+                            class="edit-file"
+                        >
+                        @error('image')
+                            <div class="edit-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="edit-actions">
+                        <button type="submit" class="edit-button">Update post</button>
+                        <a href="{{ route('posts.show', $post->id) }}" class="edit-link">Open post</a>
+                    </div>
+                </form>
+            </section>
+        </div>
     </div>
 @endsection

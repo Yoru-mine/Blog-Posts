@@ -2,98 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Comment;
-use App\Models\Post;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class CommentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
-
-
-
     public function index()
     {
-
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
 
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'post_id' => 'required|exists:posts,id',
             'text' => 'required|string|max:1000',
-
         ]);
 
         Comment::create([
             'post_id' => $request->post_id,
+            'user_id' => Auth::id(),
+            'author' => Auth::user()->name,
             'text' => $request->text,
-            'author' => 'Гость',
         ]);
-        return redirect()->back();
+
+        return redirect()->back()->with('success', 'Comment added successfully.');
     }
 
     public function postComment(string $id)
     {
-
     }
 
     public function commentInt(string $id)
     {
-
     }
 
-
-
-
-    /**
-     * Display the specified resource.
-     */
-    // public function show(string $id)
-    // {
-
-    // }
-
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $comment = Comment::findOrFail($id);
+        if (Auth::id() !== $comment->user_id && !Auth::user()->isAdmin()) {
+            abort(403);
+        }
+        $comment->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'comment_id' => (int) $id,
+            ]);
+        }
+
+        return back()->with('success', 'Comment deleted successfully.');
     }
 }
