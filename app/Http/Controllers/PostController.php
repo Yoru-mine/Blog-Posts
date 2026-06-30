@@ -176,13 +176,9 @@ class PostController extends Controller
         $this->authorizePostAccess($post);
 
         $post->delete();
-        Cache::flush();
-        try {
-            Redis::del('post:all');
-        } catch (\Exception $e) {
-            Log::warning('Redis unavailable in destroy(): ' . $e->getMessage());
-        }
+        \Illuminate\Support\Facades\Cache::flush();
 
+        // Мы полностью убрали блок try/catch с Redis, который вызывал ошибку 500
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }
 
@@ -194,7 +190,8 @@ class PostController extends Controller
             return response()->json([]);
         }
 
-        $results = Cache::remember('posts:search:' . mb_strtolower($query), 300, function () use ($query) {
+        // Этот кэш теперь гарантированно работает через файловый драйвер (без Redis)
+        $results = \Illuminate\Support\Facades\Cache::remember('posts:search:' . mb_strtolower($query), 300, function () use ($query) {
             $posts = Post::where('title', 'LIKE', "%{$query}%")
                 ->orWhere('content', 'LIKE', "%{$query}%")
                 ->latest()

@@ -303,9 +303,15 @@
 
                     <div class="edit-actions">
                         <button type="submit" class="edit-button">Update post</button>
-                        <button type="submit" class="delete-button">Delete</button>
+
                         <a href="{{ route('posts.show', $post->id) }}" class="edit-link">Open post</a>
                     </div>
+                </form>
+                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="display: inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this post?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="delete-button">Delete</button>
                 </form>
             </section>
         </div>
