@@ -1,5 +1,11 @@
 <?php
+use Illuminate\Support\Facades\Artisan;
 
+try {
+    Artisan::call('migrate', ['--force' => true]);
+} catch (\Exception $e) {
+
+}
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileUploadController;
@@ -79,7 +85,7 @@ Route::middleware('auth')->group(function () {
             return back()->with('error', 'You cannot change your own admin role.');
         }
 
-        $user->is_admin = ! $user->is_admin;
+        $user->is_admin = !$user->is_admin;
         $user->save();
 
         return back()->with('success', 'User role updated.');
@@ -100,4 +106,4 @@ Route::middleware('auth')->group(function () {
 Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
