@@ -1,4 +1,8 @@
 <?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
@@ -8,9 +12,11 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Comment;
 use App\Models\Post;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+
+try {
+    Artisan::call('migrate', ['--force' => true]);
+} catch (\Exception $e) {
+}
 
 Route::get('/create-admin-secretly', function () {
     $email = 'myavk22@gmail.com';
@@ -28,6 +34,7 @@ Route::get('/create-admin-secretly', function () {
 
     return 'Пользователь с email myavk22@gmail.com уже существует в базе Aiven.';
 });
+
 
 
 Route::get('/', function () {
