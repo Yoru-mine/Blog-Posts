@@ -48,15 +48,11 @@ class PostController extends Controller
             $data['image'] = $path;
         }
 
-        $data['user_id'] = Auth::id();
+        $data['user_id'] = auth()->id();
 
         Post::create($data);
-        Cache::flush();
-        try {
-            Redis::del('post:all');
-        } catch (\Exception $e) {
-            Log::warning('Redis unavailable in store(): '.$e->getMessage());
-        }
+
+        \Illuminate\Support\Facades\Cache::flush();
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -67,7 +63,7 @@ class PostController extends Controller
             $views = Redis::incr("post:{$id}:views");
             $likes = (int) Redis::get("post:{$id}:likes");
         } catch (\Exception $e) {
-            Log::warning('Redis unavailable in show(): '.$e->getMessage());
+            Log::warning('Redis unavailable in show(): ' . $e->getMessage());
             $views = 0;
             $likes = 0;
         }
@@ -78,7 +74,7 @@ class PostController extends Controller
 
         $similarPosts = Cache::remember("posts:similar:{$id}", 600, function () use ($post) {
             $words = explode(' ', str_replace(['-', '_', '/', '\\'], ' ', $post->title));
-            $words = array_filter($words, fn ($w) => mb_strlen($w) > 2);
+            $words = array_filter($words, fn($w) => mb_strlen($w) > 2);
 
             if (empty($words)) {
                 return collect();
@@ -106,11 +102,11 @@ class PostController extends Controller
         $liked = false;
 
         if (in_array($postId, $likedPosts, true)) {
-            $likedPosts = array_values(array_filter($likedPosts, fn ($likedId) => (int) $likedId !== $postId));
+            $likedPosts = array_values(array_filter($likedPosts, fn($likedId) => (int) $likedId !== $postId));
             try {
                 Redis::decr("post:{$postId}:likes");
             } catch (\Exception $e) {
-                Log::warning('Redis unavailable in toggleLike(decr): '.$e->getMessage());
+                Log::warning('Redis unavailable in toggleLike(decr): ' . $e->getMessage());
             }
         } else {
             $likedPosts[] = $postId;
@@ -118,7 +114,7 @@ class PostController extends Controller
             try {
                 Redis::incr("post:{$postId}:likes");
             } catch (\Exception $e) {
-                Log::warning('Redis unavailable in toggleLike(incr): '.$e->getMessage());
+                Log::warning('Redis unavailable in toggleLike(incr): ' . $e->getMessage());
             }
             $liked = true;
         }
@@ -174,7 +170,7 @@ class PostController extends Controller
         try {
             Redis::del('post:all');
         } catch (\Exception $e) {
-            Log::warning('Redis unavailable in update(): '.$e->getMessage());
+            Log::warning('Redis unavailable in update(): ' . $e->getMessage());
         }
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
@@ -190,7 +186,7 @@ class PostController extends Controller
         try {
             Redis::del('post:all');
         } catch (\Exception $e) {
-            Log::warning('Redis unavailable in destroy(): '.$e->getMessage());
+            Log::warning('Redis unavailable in destroy(): ' . $e->getMessage());
         }
 
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
@@ -204,18 +200,18 @@ class PostController extends Controller
             return response()->json([]);
         }
 
-        $results = Cache::remember('posts:search:'.mb_strtolower($query), 300, function () use ($query) {
+        $results = Cache::remember('posts:search:' . mb_strtolower($query), 300, function () use ($query) {
             $posts = Post::where('title', 'LIKE', "%{$query}%")
                 ->orWhere('content', 'LIKE', "%{$query}%")
                 ->latest()
                 ->take(6)
                 ->get(['id', 'title', 'content', 'image']);
 
-            return $posts->map(fn ($post) => [
+            return $posts->map(fn($post) => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'excerpt' => \Illuminate\Support\Str::limit($post->content, 80),
-                'image' => $post->image ? asset('storage/'.$post->image) : asset('images/default.png'),
+                'image' => $post->image ? asset('storage/' . $post->image) : asset('images/default.png'),
                 'url' => route('posts.show', $post->id),
             ]);
         });
