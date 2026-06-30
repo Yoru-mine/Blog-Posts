@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Http\Requests\StorePostRequest;
+
 class ApiPostController extends Controller
 {
     public function index()
@@ -33,16 +34,17 @@ class ApiPostController extends Controller
     public function show($id)
     {
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Post not found'], 404);
         }
+
         return new PostResource($post);
     }
 
     public function update(StorePostRequest $request, $id)
     {
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Post not found'], 404);
         }
 
@@ -64,7 +66,7 @@ class ApiPostController extends Controller
     public function destroy($id)
     {
         $post = Post::find($id);
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Post not found'], 404);
         }
 

@@ -161,66 +161,42 @@
         }
 
         .like-button {
-            width: 58px;
-            height: 58px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.08);
+            background: none;
+            border: none;
             color: #f6f0e6;
             font-family: inherit;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition:
-                transform 0.18s ease,
-                background 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease,
-                opacity 0.2s ease;
+            padding: 8px;
+            transition: transform 0.18s ease, color 0.2s ease, opacity 0.2s ease;
         }
 
         .like-button:hover,
         .like-button:focus-visible {
-            transform: translateY(-1px) scale(1.03);
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.24);
-            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+            transform: scale(1.12);
             outline: none;
         }
 
+
         .like-button:active {
-            transform: scale(0.94);
+            transform: scale(0.92);
         }
+
 
         .like-button.is-liked {
-            background: rgba(255, 214, 224, 0.92);
-            color: #b43f63;
-            border-color: transparent;
-            box-shadow: 0 10px 26px rgba(180, 63, 99, 0.22);
+            .like-button.is-liked {
+                color: #b43f63;
+            }
+
         }
 
-        .like-button.is-loading {
-            pointer-events: none;
-            opacity: 0.72;
-        }
 
-        .like-button::after {
-            content: "";
-            position: absolute;
-            inset: 8px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 221, 229, 0.55) 0%, rgba(255, 221, 229, 0) 72%);
-            opacity: 0;
-            transform: scale(0.45);
-            pointer-events: none;
-        }
 
-        .like-button.is-liked.is-animating::after {
-            animation: like-ring 0.55s ease-out;
-        }
+
+
+
 
         .like-icon {
             width: 28px;
@@ -234,11 +210,12 @@
         .like-icon path {
             fill: none;
             stroke: currentColor;
-            stroke-width: 1.9;
+            stroke-width: 2.2;
             stroke-linecap: round;
             stroke-linejoin: round;
             transition: fill 0.22s ease, stroke 0.22s ease;
         }
+
 
         .like-button:hover .like-icon,
         .like-button:focus-visible .like-icon {
@@ -543,6 +520,116 @@
                 width: 100%;
             }
         }
+
+            .char-counter {
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.48);
+                text-align: right;
+                width: 100%;
+                margin-top: -10px;
+            }
+
+            .char-counter.is-over {
+                color: #ff9a9a;
+            }
+
+            .share-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 8px;
+                color: var(--text-main);
+                opacity: 0.8;
+                transition: transform 0.18s ease, opacity 0.2s ease;
+            }
+
+            .share-button:hover,
+            .share-button:focus-visible {
+                transform: scale(1.12);
+                opacity: 1;
+                outline: none;
+            }
+
+            .share-button:active {
+                transform: scale(0.92);
+            }
+
+            .share-icon {
+                display: block;
+                width: 28px;
+                height: 28px;
+                color: var(--text-main);
+            }
+
+            .share-toast {
+                position: fixed;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(24, 24, 24, 0.95);
+                color: #f4f4f4;
+                padding: 12px 24px;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                font-size: 14px;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s ease, transform 0.3s ease;
+                z-index: 1600;
+            }
+
+            .share-toast.is-visible {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-8px);
+            }
+
+            .similar-posts {
+                margin-top: 40px;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+                padding-top: 28px;
+            }
+
+            .similar-posts h4 {
+                font-size: 28px;
+                margin: 0 0 18px;
+            }
+
+            .similar-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 16px;
+            }
+
+            .similar-card {
+                display: grid;
+                gap: 10px;
+                padding: 14px;
+                text-decoration: none;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.06);
+                color: inherit;
+                transition: transform 0.2s ease, background 0.2s ease;
+            }
+
+            .similar-card:hover {
+                transform: translateY(-2px);
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .similar-img {
+                width: 100%;
+                height: 140px;
+                object-fit: cover;
+                display: block;
+            }
+
+            .similar-title {
+                font-size: 15px;
+                line-height: 1.4;
+                color: rgba(255, 255, 255, 0.88);
+            }
     </style>
 
     @php
@@ -568,23 +655,36 @@
 
                     <form action="{{ route('posts.like', $post->id) }}" method="POST" class="like-form" data-like-form>
                         @csrf
-                        <button
-                            type="submit"
-                            class="like-button {{ $isLiked ? 'is-liked' : '' }}"
+                        <button type="submit" class="like-button {{ $isLiked ? 'is-liked' : '' }}"
                             aria-label="{{ $isLiked ? 'Unlike post' : 'Like post' }}"
-                            aria-pressed="{{ $isLiked ? 'true' : 'false' }}"
-                            data-like-button
-                        >
+                            aria-pressed="{{ $isLiked ? 'true' : 'false' }}" data-like-button>
                             <svg class="like-icon" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 20.4 4.9 13.8A4.85 4.85 0 0 1 11.8 7l.2.24.2-.24a4.85 4.85 0 0 1 6.9 6.8Z" />
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                             </svg>
+
                         </button>
                     </form>
+                    <button class="share-button" id="share-button" aria-label="Share post">
+                        <svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
+                                fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="16 6 12 2 8 6"
+                                fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="12" y1="2" x2="12" y2="15"
+                                stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    <div class="share-toast" id="share-toast">Link copied!</div>
                 </div>
 
                 <p class="post-text">{{ $post->content }}</p>
                 @if ($post->user)
-                    <a href="{{ route('users.show', $post->user) }}" class="post-author-card" aria-label="Open author profile">
+                    <a href="{{ route('users.show', $post->user) }}" class="post-author-card"
+                        aria-label="Open author profile">
                         <div class="post-author-avatar" style="background-image: url('{{ $postAuthorAvatarUrl }}');"></div>
 
                         <div class="post-author-copy">
@@ -596,7 +696,8 @@
                 @endif
                 <div class="post-stats">
                     <p class="post-views"><strong>Views:</strong> {{ $views }}</p>
-                    <p class="post-likes-count"><strong>Likes:</strong> <span data-like-count>{{ $likes }}</span></p>
+                    <p class="post-likes-count"><strong>Likes:</strong> <span data-like-count>{{ $likes }}</span>
+                    </p>
                 </div>
                 <h4>Comments:</h4>
 
@@ -610,23 +711,21 @@
                                     ? asset('storage/' . $comment->user->avatar)
                                     : asset('images/default-avatar.svg');
                             @endphp
-                            <div
-                                id="comment-{{ $comment->id }}"
-                                class="comment-card"
-                                role="article"
-                                aria-label="Comment by {{ $comment->author }}"
-                            >
+                            <div id="comment-{{ $comment->id }}" class="comment-card" role="article"
+                                aria-label="Comment by {{ $comment->user?->name ?? $comment->author }}">
                                 <div class="comment-top">
-                                    <div class="comment-avatar" style="background-image: url('{{ $commentAvatarUrl }}');"></div>
+                                    <div class="comment-avatar" style="background-image: url('{{ $commentAvatarUrl }}');">
+                                    </div>
 
                                     <div class="comment-body">
                                         <p class="comment-author">
                                             @if ($comment->user)
-                                                <a href="{{ route('users.show', $comment->user) }}" class="comment-author-link">
-                                                    {{ $comment->author }}
+                                                <a href="{{ route('users.show', $comment->user) }}"
+                                                    class="comment-author-link">
+                                                    {{ $comment->user?->name ?? $comment->author }}
                                                 </a>
                                             @else
-                                                {{ $comment->author }}
+                                                {{ $comment->user?->name ?? $comment->author }}
                                             @endif
                                         </p>
                                         <p class="comment-text">{{ $comment->text }}</p>
@@ -636,33 +735,50 @@
 
                                 @if (auth()->id() === $comment->user_id || auth()->user()?->isAdmin())
                                     <div class="comment-actions">
-                                        <form
-                                            action="{{ route('comments.destroy', $comment->id) }}"
-                                            method="POST"
-                                            data-comment-delete-form
-                                            data-confirm
-                                            data-confirm-ajax="true"
+                                        <form action="{{ route('comments.destroy', $comment->id) }}" method="POST"
+                                            data-comment-delete-form data-confirm data-confirm-ajax="true"
                                             data-confirm-title="Delete comment?"
                                             data-confirm-message="This comment will be removed permanently from the post."
-                                            data-confirm-button="Delete comment"
-                                        >
+                                            data-confirm-button="Delete comment">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="comment-delete-button" data-comment-delete-button>Delete</button>
+                                            <button type="submit" class="comment-delete-button"
+                                                data-comment-delete-button>Delete</button>
                                         </form>
                                     </div>
                                 @endif
+                                @include('components.comment-reactions', ['comment' => $comment])
                             </div>
                         @endforeach
                     </div>
                 @endif
 
-                <form action="{{ route('comments.store', ['post' => $post->id]) }}" method="POST" class="comment-form" novalidate>
+                <form action="{{ route('comments.store', ['post' => $post->id]) }}" method="POST" class="comment-form"
+                    novalidate>
                     @csrf
                     <input type="hidden" name="post_id" value="{{ $post->id }}">
-                    <input type="text" name="text" id="comment-text" placeholder="Write a comment..." aria-label="Comment text" required>
+                    <input type="text" name="text" id="comment-text" placeholder="Write a comment..."
+                        aria-label="Comment text" required>
+                    <div class="char-counter" id="comment-counter">0 / 1000</div>
+
                     <button type="submit" aria-label="Send comment">Send</button>
                 </form>
+
+                @if ($similarPosts->isNotEmpty())
+                    <div class="similar-posts">
+                        <h4>Similar posts</h4>
+                        <div class="similar-grid">
+                            @foreach ($similarPosts as $similar)
+                                <a href="{{ route('posts.show', $similar->id) }}" class="similar-card">
+                                    @if ($similar->image)
+                                        <img src="{{ asset('storage/' . $similar->image) }}" alt="" class="similar-img">
+                                    @endif
+                                    <span class="similar-title">{{ $similar->title }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -674,14 +790,12 @@
             const likeCount = document.querySelector('[data-like-count]');
             let commentsList = document.querySelector('.comments-list');
 
+
             if (likeForm && likeButton && likeCount) {
                 likeForm.addEventListener('submit', async (event) => {
                     event.preventDefault();
 
-                    if (likeButton.classList.contains('is-loading')) {
-                        return;
-                    }
-
+                    if (likeButton.classList.contains('is-loading')) return;
                     likeButton.classList.add('is-loading');
 
                     try {
@@ -695,9 +809,7 @@
                             credentials: 'same-origin',
                         });
 
-                        if (!response.ok) {
-                            throw new Error('Like request failed.');
-                        }
+                        if (!response.ok) throw new Error('Like request failed.');
 
                         const data = await response.json();
                         likeButton.classList.toggle('is-liked', Boolean(data.liked));
@@ -706,9 +818,7 @@
                         likeButton.setAttribute('aria-label', data.liked ? 'Unlike post' : 'Like post');
                         likeCount.textContent = data.likes;
 
-                        window.setTimeout(() => {
-                            likeButton.classList.remove('is-animating');
-                        }, 520);
+                        window.setTimeout(() => likeButton.classList.remove('is-animating'), 520);
                     } catch (error) {
                         window.location.href = '{{ route('login') }}';
                     } finally {
@@ -717,63 +827,197 @@
                 });
             }
 
-            document.querySelectorAll('[data-comment-delete-form]').forEach((form) => {
-                const runDelete = async () => {
-                    const button = form.querySelector('[data-comment-delete-button]');
-                    const commentCard = form.closest('.comment-card');
 
-                    if (!button || !commentCard || button.classList.contains('is-loading')) {
-                        return;
-                    }
+            const shareBtn = document.getElementById('share-button');
+            const shareToast = document.getElementById('share-toast');
 
-                    button.classList.add('is-loading');
+            shareBtn?.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    shareToast?.classList.add('is-visible');
+                    setTimeout(() => shareToast?.classList.remove('is-visible'), 2000);
+                } catch {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = window.location.href;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    shareToast?.classList.add('is-visible');
+                    setTimeout(() => shareToast?.classList.remove('is-visible'), 2000);
+                }
+            });
+
+            function attachDeleteHandlers() {
+                document.querySelectorAll('[data-comment-delete-form]').forEach((form) => {
+                    if (form.dataset.deleteAttached) return;
+                    form.dataset.deleteAttached = 'true';
+
+                    const runDelete = async () => {
+                        const button = form.querySelector('[data-comment-delete-button]');
+                        const commentCard = form.closest('.comment-card');
+
+                        if (!button || !commentCard || button.classList.contains('is-loading'))
+                            return;
+                        button.classList.add('is-loading');
+
+                        try {
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                body: new FormData(form),
+                                credentials: 'same-origin',
+                            });
+
+                            if (!response.ok) throw new Error('Delete request failed.');
+
+                            commentCard.classList.add('is-removing');
+
+                            window.setTimeout(() => {
+                                commentCard.remove();
+
+                                if (commentsList && !commentsList.querySelector(
+                                        '.comment-card')) {
+                                    commentsList.remove();
+                                    commentsList = null;
+
+                                    if (!document.querySelector('[data-comments-empty]')) {
+                                        const emptyState = document.createElement('p');
+                                        emptyState.className = 'text-muted';
+                                        emptyState.dataset.commentsEmpty = 'true';
+                                        emptyState.style.userSelect = 'none';
+                                        emptyState.textContent = 'No comments yet.';
+                                        document.querySelector('.post-info-box h4')
+                                            ?.insertAdjacentElement('afterend', emptyState);
+                                    }
+                                }
+                            }, 280);
+                        } catch (error) {
+                            button.classList.remove('is-loading');
+                        }
+                    };
+
+                    form.addEventListener('submit', (e) => e.preventDefault());
+                    form.addEventListener('confirmed-submit', runDelete);
+                });
+            }
+
+            attachDeleteHandlers();
+
+
+            const commentInput = document.getElementById('comment-text');
+            const commentCounter = document.getElementById('comment-counter');
+
+            if (commentInput && commentCounter) {
+                commentInput.addEventListener('input', () => {
+                    const len = commentInput.value.length;
+                    commentCounter.textContent = `${len} / 1000`;
+                    commentCounter.classList.toggle('is-over', len > 1000);
+                });
+            }
+
+
+            const commentForm = document.querySelector('.comment-form');
+
+            if (commentForm) {
+                commentForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    const input = commentForm.querySelector('input[name="text"]');
+                    const submitButton = commentForm.querySelector('button[type="submit"]');
+                    const text = input?.value.trim();
+
+                    if (!text) return;
+
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Sending...';
 
                     try {
-                        const response = await fetch(form.action, {
+                        const response = await fetch(commentForm.action, {
                             method: 'POST',
                             headers: {
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest',
                             },
-                            body: new FormData(form),
+                            body: new FormData(commentForm),
                             credentials: 'same-origin',
                         });
 
-                        if (!response.ok) {
-                            throw new Error('Delete request failed.');
+                        if (!response.ok) throw new Error('Comment request failed.');
+
+                        const data = await response.json();
+
+                        if (!data.success) throw new Error('Server error.');
+
+                        const c = data.comment;
+
+                        document.querySelector('[data-comments-empty]')?.remove();
+
+                        if (!commentsList) {
+                            commentsList = document.createElement('div');
+                            commentsList.className = 'comments-list';
+                            commentForm.insertAdjacentElement('beforebegin', commentsList);
                         }
 
-                        commentCard.classList.add('is-removing');
+                        const isOwner = {{ auth()->id() ?? 'null' }} === c.user_id;
+                        const isAdmin = {{ auth()->user()?->isAdmin() ? 'true' : 'false' }};
 
-                        window.setTimeout(() => {
-                            commentCard.remove();
+                        const deleteFormHtml = (isOwner || isAdmin) ? `
+                        <div class="comment-actions">
+                            <form action="/comments/${c.id}" method="POST"
+                                data-comment-delete-form data-confirm data-confirm-ajax="true"
+                                data-confirm-title="Delete comment?"
+                                data-confirm-message="This comment will be removed permanently from the post."
+                                data-confirm-button="Delete comment">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="comment-delete-button" data-comment-delete-button>Delete</button>
+                            </form>
+                        </div>` : '';
 
-                            if (commentsList && !commentsList.querySelector('.comment-card')) {
-                                commentsList.remove();
-                                commentsList = null;
+                        const profileLink = c.profile_url ?
+                            `<a href="${c.profile_url}" class="comment-author-link">${c.author}</a>` :
+                            c.author;
 
-                                if (!document.querySelector('[data-comments-empty]')) {
-                                    const emptyState = document.createElement('p');
-                                    emptyState.className = 'text-muted';
-                                    emptyState.dataset.commentsEmpty = 'true';
-                                    emptyState.style.userSelect = 'none';
-                                    emptyState.textContent = 'No comments yet.';
-                                    const commentsTitle = document.querySelector('.post-info-box h4');
-                                    commentsTitle?.insertAdjacentElement('afterend', emptyState);
-                                }
-                            }
-                        }, 280);
+                        const card = document.createElement('div');
+                        card.id = `comment-${c.id}`;
+                        card.className = 'comment-card';
+                        card.setAttribute('role', 'article');
+                        card.setAttribute('aria-label', `Comment by ${c.author}`);
+                        card.innerHTML = `
+                        <div class="comment-top">
+                            <div class="comment-avatar" style="background-image: url('${c.avatar}');"></div>
+                            <div class="comment-body">
+                                <p class="comment-author">${profileLink}</p>
+                                <p class="comment-text">${c.text}</p>
+                                <small class="comment-time">${c.created_at}</small>
+                            </div>
+                        </div>
+                        ${deleteFormHtml}
+                    `;
+
+                        commentsList.appendChild(card);
+                        attachDeleteHandlers();
+                        attachReactionHandlers(card);
+
+                        input.value = '';
+
+                        card.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest'
+                        });
+
                     } catch (error) {
-                        button.classList.remove('is-loading');
+                        alert('Failed to send comment. Please try again.');
+                    } finally {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Send';
                     }
-                };
-
-                form.addEventListener('submit', (event) => {
-                    event.preventDefault();
                 });
-
-                form.addEventListener('confirmed-submit', runDelete);
-            });
+            }
         });
     </script>
 @endsection

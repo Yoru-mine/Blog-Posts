@@ -130,13 +130,15 @@
         <div class="admin-list-shell">
             <section class="admin-list-hero">
                 <h1 class="admin-list-title">Manage posts</h1>
-                <p class="admin-list-copy">A clean list of all posts in the project with their owners and quick access to open or edit each one.</p>
+                <p class="admin-list-copy">A clean list of all posts in the project with their owners and quick access to
+                    open or edit each one.</p>
             </section>
 
             <section class="admin-table-card">
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Image</th>
                             <th>Title</th>
                             <th>Owner</th>
                             <th>Created</th>
@@ -146,6 +148,11 @@
                     <tbody>
                         @forelse ($posts as $post)
                             <tr>
+                                <td>
+                                    <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                                        alt="{{ $post->title }}"
+                                        style="width: 64px; height: 48px; object-fit: cover; display: block;">
+                                </td>
                                 <td>{{ $post->title }}</td>
                                 <td>{{ $post->user?->name ?? 'No owner' }}</td>
                                 <td>{{ $post->created_at->format('d.m.Y') }}</td>
@@ -153,14 +160,10 @@
                                     <div class="admin-actions">
                                         <a href="{{ route('posts.show', $post->id) }}" class="admin-action-link">Open</a>
                                         <a href="{{ route('posts.edit', $post->id) }}" class="admin-action-link">Edit</a>
-                                        <form
-                                            action="{{ route('posts.destroy', $post->id) }}"
-                                            method="POST"
-                                            data-confirm
+                                        <form action="{{ route('posts.destroy', $post->id) }}" method="POST" data-confirm
                                             data-confirm-title="Delete post?"
                                             data-confirm-message="This post will be removed permanently from the project."
-                                            data-confirm-button="Delete post"
-                                        >
+                                            data-confirm-button="Delete post">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="admin-action-button danger">Delete</button>

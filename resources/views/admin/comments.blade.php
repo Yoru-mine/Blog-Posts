@@ -142,7 +142,7 @@
                             <tr>
                                 <td>
                                     @if ($comment->user)
-                                        <a href="{{ route('users.show', $comment->user) }}">{{ $comment->author }}</a>
+                                        <a href="{{ route('users.show', $comment->user) }}">{{ $comment->user->name }}</a>
                                     @else
                                         {{ $comment->author }}
                                     @endif

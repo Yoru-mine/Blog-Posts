@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreCommentRequest;
+
 class CommentController extends Controller
 {
     /**
@@ -41,9 +41,10 @@ class CommentController extends Controller
     public function show(string $id)
     {
         $comment = Comment::find($id);
-        if (!$comment) {
+        if (! $comment) {
             return response()->json(['message' => 'Comment not found', 404]);
         }
+
         return new CommentResource($comment);
     }
 
@@ -53,7 +54,7 @@ class CommentController extends Controller
     public function update(Request $request, string $id)
     {
         $comment = Comment::find($id);
-        if (!$comment) {
+        if (! $comment) {
             return response()->json(['message' => 'Comment is not found'], 404);
         }
         $validated = $request->validated();
@@ -65,6 +66,7 @@ class CommentController extends Controller
             $data['image'] = $path;
         }
         $comment->update($data);
+
         return new CommentResource($comment);
     }
 
@@ -75,11 +77,12 @@ class CommentController extends Controller
     {
         $comment = Comment::find($id);
 
-        if (!$comment) {
+        if (! $comment) {
             return response()->json(['message' => 'comment is not found', 404]);
         }
 
         $comment->delete();
+
         return new CommentResource($comment);
     }
 }

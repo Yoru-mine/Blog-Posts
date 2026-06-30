@@ -13,6 +13,18 @@
             <span>A simple platform for your thoughts and stories.</span>
         </div>
 
+        <div class="footer-socials">
+            <h3>Connect with me</h3>
+            <ul>
+                <li><a href="https://t.me/myavk88" target="_blank">Telegram</a></li>
+                <li><a href="https://www.instagram.com/myavk88?igsh=MXN5NnNlcnluajJ5cg==" target="_blank">Instagram</a>
+                </li>
+                <li><a href="https://www.linkedin.com/in/sabina-aznabaeva-630668357?utm_source=share_via&utm_content=profile&utm_medium=member_android"
+                        target="_blank">LinkedIn</a></li>
+                <li><a href="https://github.com/myavkmrazi" target="_blank">GitHub</a></li>
+            </ul>
+        </div>
+
         <div class="footer-right">
             <ul>
                 <li><a href="{{ route('home') }}">Home</a></li>
@@ -26,6 +38,7 @@
         © 2026 MakeABlog. All rights reserved.
     </div>
 </footer>
+
 <style>
     footer.footer {
         width: 100%;
@@ -68,6 +81,37 @@
         color: #aaa;
     }
 
+    /* Стили для текстового блока соцсетей */
+    .footer-socials h3 {
+        font-size: 16px;
+        margin-bottom: 14px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .footer-socials ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-socials a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        opacity: 0.88;
+        transition: color 0.25s ease, opacity 0.25s ease;
+    }
+
+    /* При наведении ссылка плавно окрашивается в твой фирменный мятный цвет */
+    .footer-socials a:hover {
+        opacity: 1;
+        color: #00FFCC;
+    }
+
     .footer-right ul {
         list-style: none;
         display: flex;
@@ -90,6 +134,7 @@
     @media (max-width: 900px) {
         .footer-inner {
             flex-direction: column;
+            gap: 32px;
         }
     }
 </style>

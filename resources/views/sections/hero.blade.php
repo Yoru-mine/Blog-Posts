@@ -7,9 +7,9 @@
 
 <style>
     .title-hero {
-        font-size: 68px;
+        font-size: clamp(32px, 9vw, 68px);
         margin: 0;
-        line-height: 1;
+        line-height: 1.1;
     }
 
     .hero {
@@ -18,6 +18,7 @@
         align-items: center;
         justify-content: center;
         min-height: 100vh;
+        min-height: 100dvh;
         text-align: center;
         position: relative;
         isolation: isolate;
@@ -25,7 +26,9 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        padding: 100px 24px 40px;
+        padding: 100px 20px 40px;
+        width: 100%;
+        overflow: hidden;
     }
 
     .hero::before {
@@ -47,7 +50,7 @@
     }
 
     .hero-content h1 {
-        letter-spacing: 4px;
+        letter-spacing: clamp(1px, 0.6vw, 4px);
         color: white;
         mix-blend-mode: difference;
         text-wrap: balance;
@@ -55,11 +58,11 @@
 
     .btn {
         display: inline-block;
-        padding: 26px 45px;
+        padding: clamp(14px, 3vw, 26px) clamp(22px, 5vw, 45px);
         background-color: rgba(0, 0, 0, 0.7);
         color: #fff;
         text-decoration: none;
-        margin-top: 137px;
+        margin-top: clamp(32px, 10vw, 137px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         transition: transform 0.25s ease, background-color 0.25s ease;
     }
@@ -69,14 +72,13 @@
         background-color: rgba(0, 0, 0, 0.78);
     }
 
-    @media (max-width: 900px) {
-        .title-hero {
-            font-size: 46px;
+    @media (max-width: 480px) {
+        .hero-content {
+            max-width: 100%;
         }
 
-        .btn {
-            margin-top: 72px;
-            padding: 18px 28px;
+        .title-hero {
+            letter-spacing: 1px;
         }
     }
 </style>

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Controllers\Api\V1\ApiPostController;
+
 class PostResource extends JsonResource
 {
     /**

@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class PostSeeder extends Seeder
 {
@@ -26,34 +26,34 @@ class PostSeeder extends Seeder
 
         if (File::isDirectory($imagesPath)) {
             $files = File::files($imagesPath);
-            
+
             // Exclude list (lowercase names without extension)
             $excludeNames = [
-                'es', 
-                'eye 1', 
-                'fon', 
-                'gradient-back', 
-                'images', 
-                'klava', 
-                'klava2', 
-                'knopka', 
+                'es',
+                'eye 1',
+                'fon',
+                'gradient-back',
+                'images',
+                'klava',
+                'klava2',
+                'knopka',
                 'mv1',
-                'default-avatar'
+                'default-avatar',
             ];
-            
+
             foreach ($files as $file) {
                 $nameWithoutExtension = pathinfo($file->getFilename(), PATHINFO_FILENAME);
                 $extension = strtolower($file->getExtension());
-                
+
                 // Only allow common image extensions
                 if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
-                    if (!in_array(strtolower($nameWithoutExtension), $excludeNames)) {
+                    if (! in_array(strtolower($nameWithoutExtension), $excludeNames)) {
                         $filename = $file->getFilename();
                         $allowedImages[] = $filename;
-                        
+
                         // Copy to storage disk 'public' under 'posts' folder
                         $fileContent = File::get($file->getRealPath());
-                        Storage::disk('public')->put('posts/' . $filename, $fileContent);
+                        Storage::disk('public')->put('posts/'.$filename, $fileContent);
                     }
                 }
             }
@@ -159,7 +159,7 @@ class PostSeeder extends Seeder
         foreach ($posts as $index => $post) {
             $user = $users[$post['email']] ?? null;
 
-            if (!$user) {
+            if (! $user) {
                 continue;
             }
 
@@ -168,9 +168,9 @@ class PostSeeder extends Seeder
             $imagePath = null;
 
             if ($imageName && in_array($imageName, $allowedImages)) {
-                $imagePath = 'posts/' . $imageName;
-            } elseif (!empty($allowedImages)) {
-                $imagePath = 'posts/' . $allowedImages[$index % count($allowedImages)];
+                $imagePath = 'posts/'.$imageName;
+            } elseif (! empty($allowedImages)) {
+                $imagePath = 'posts/'.$allowedImages[$index % count($allowedImages)];
             }
 
             Post::updateOrCreate(

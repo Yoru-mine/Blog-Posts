@@ -55,17 +55,17 @@
     }
 
     .create-posts-section .title-main {
-        font-size: 48px;
+        font-size: clamp(28px, 6vw, 48px);
         color: white;
         margin-bottom: 42px;
         text-align: center;
     }
 
     .create-posts-section .form-container {
-        width: 1166px;
-        height: 790px;
+        width: 100%;
+        max-width: 1166px;
         background: rgba(0, 0, 0, 0.33);
-        padding: 40px;
+        padding: clamp(20px, 4vw, 40px);
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -74,11 +74,18 @@
         backdrop-filter: blur(10px);
     }
 
+    .create-posts-section .form-container form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .create-posts-section .image-box {
-        width: 445px;
-        height: 241px;
+        width: min(445px, 100%);
+        aspect-ratio: 16 / 9;
         background: #1B1A1A;
-        margin: 0 auto 79px;
+        margin: 0 auto clamp(32px, 6vw, 79px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -104,7 +111,7 @@
     }
 
     .create-posts-section .field {
-        width: 870px;
+        width: min(870px, 100%);
         margin: 0 auto 20px;
         display: flex;
         flex-direction: column;
@@ -123,6 +130,8 @@
         background: #1B1A1A;
         border: none;
         color: white;
+        font-family: inherit;
+        font-size: 15px;
         padding: 10px;
         box-sizing: border-box;
     }
@@ -133,14 +142,15 @@
 
     .create-posts-section .field textarea {
         height: 101px;
-        resize: none;
+        resize: vertical;
     }
 
     .create-posts-section .btn1 {
-        width: 216px;
-        height: 75px;
+        width: min(216px, 100%);
+        height: 64px;
         background: rgba(16, 16, 16, 0.88);
         color: white;
+        font-family: inherit;
         border: 1px solid rgba(255, 255, 255, 0.1);
         cursor: pointer;
         transition: 0.3s;
@@ -159,12 +169,18 @@
     .create-posts-section .errors {
         color: #ff6b6b;
         margin-bottom: 15px;
-        width: 870px;
+        width: min(870px, 100%);
     }
 
-    @media (max-width: 1280px) {
+    @media (max-width: 768px) {
+        .create-posts-section {
+            padding: 0 0 80px;
+        }
+
         .create-posts-section .background {
-            width: calc(100% - 40px);
+            width: 100%;
+            min-height: unset;
+            padding: 80px 16px 48px;
         }
     }
 </style>

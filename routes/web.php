@@ -1,19 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $posts = Post::latest()->take(8)->get();
+
     return view('home', compact('posts'));
 })->name('home');
 
@@ -57,16 +58,19 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin-panel/posts', function () {
         $posts = Post::latest()->with('user')->paginate(10);
+
         return view('admin.posts', compact('posts'));
     })->middleware('admin')->name('admin.posts');
 
     Route::get('/admin-panel/comments', function () {
         $comments = Comment::latest()->with(['post', 'user'])->paginate(10);
+
         return view('admin.comments', compact('comments'));
     })->middleware('admin')->name('admin.comments');
 
     Route::get('/admin-panel/users', function () {
         $users = User::latest()->paginate(10);
+
         return view('admin.users', compact('users'));
     })->middleware('admin')->name('admin.users');
 
@@ -75,7 +79,7 @@ Route::middleware('auth')->group(function () {
             return back()->with('error', 'You cannot change your own admin role.');
         }
 
-        $user->is_admin = !$user->is_admin;
+        $user->is_admin = ! $user->is_admin;
         $user->save();
 
         return back()->with('success', 'User role updated.');
@@ -93,6 +97,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/upload', [FileUploadController::class, 'store'])->name('upload.file');
 });
 
+Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

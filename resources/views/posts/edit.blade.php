@@ -148,6 +148,7 @@
         }
 
         .edit-button,
+        .delete-button,
         .edit-link {
             display: inline-flex;
             align-items: center;
@@ -175,6 +176,18 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
+        .delete-button {
+            background: rgba(220, 80, 80, 0.15);
+            color: #efb3b3;
+            border: 1px solid rgba(220, 80, 80, 0.25);
+        }
+
+        .delete-button:hover {
+            background: rgba(220, 80, 80, 0.28);
+            transform: translateY(-1px);
+            opacity: 1;
+        }
+
         .edit-button:hover,
         .edit-link:hover {
             transform: translateY(-1px);
@@ -186,6 +199,7 @@
             line-height: 1.55;
             color: #efb3b3;
         }
+
 
         @media (max-width: 1024px) {
             .edit-hero {
@@ -223,6 +237,8 @@
             .edit-preview-image {
                 height: 210px;
             }
+
+
         }
     </style>
 
@@ -233,38 +249,32 @@
                     <span class="edit-kicker">Edit workspace</span>
                     <h1 class="edit-title">Edit your post</h1>
                     <p class="edit-copy">
-                        Update the title, text, and visual mood of your post here. The layout stays in the same atmosphere as the rest of the project, so editing feels like part of the same world.
+                        Update the title, text, and visual mood of your post here. The layout stays in the same atmosphere
+                        as the rest of the project, so editing feels like part of the same world.
                     </p>
                 </div>
 
                 <div class="edit-preview">
                     <div class="edit-preview-label">Current image</div>
-                    <img
-                        src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
-                        alt="{{ $post->title }}"
-                        class="edit-preview-image"
-                    >
+                    <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                        alt="{{ $post->title }}" class="edit-preview-image">
                     <p class="edit-preview-note">
-                        This is the image currently attached to the post. You can upload a new one below if you want to change the visual.
+                        This is the image currently attached to the post. You can upload a new one below if you want to
+                        change the visual.
                     </p>
                 </div>
             </section>
 
             <section class="edit-card">
-                <form method="POST" action="{{ route('posts.update', $post->id) }}" enctype="multipart/form-data" class="edit-form">
+                <form method="POST" action="{{ route('posts.update', $post->id) }}" enctype="multipart/form-data"
+                    class="edit-form">
                     @csrf
                     @method('PUT')
 
                     <div class="edit-field">
                         <label for="title" class="edit-label">Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            id="title"
-                            class="edit-input"
-                            value="{{ old('title', $post->title) }}"
-                            required
-                        >
+                        <input type="text" name="title" id="title" class="edit-input"
+                            value="{{ old('title', $post->title) }}" required>
                         @error('title')
                             <div class="edit-error">{{ $message }}</div>
                         @enderror
@@ -272,12 +282,7 @@
 
                     <div class="edit-field">
                         <label for="content" class="edit-label">Content</label>
-                        <textarea
-                            name="content"
-                            id="content"
-                            class="edit-textarea"
-                            required
-                        >{{ old('content', $post->content) }}</textarea>
+                        <textarea name="content" id="content" class="edit-textarea" required>{{ old('content', $post->content) }}</textarea>
                         @error('content')
                             <div class="edit-error">{{ $message }}</div>
                         @enderror
@@ -285,13 +290,12 @@
 
                     <div class="edit-field">
                         <label for="image" class="edit-label">Replace image</label>
-                        <input
-                            type="file"
-                            id="image"
-                            name="image"
-                            accept="image/*"
-                            class="edit-file"
-                        >
+                        <label for="image" class="edit-file-label">
+                            <span class="edit-file-icon">↑</span>
+                            <span class="edit-file-text" id="file-text">Choose file...</span>
+                            <input type="file" id="image" name="image" accept="image/*" style="display:none"
+                                onchange="document.getElementById('file-text').textContent = this.files[0]?.name || 'Choose file...'">
+                        </label>
                         @error('image')
                             <div class="edit-error">{{ $message }}</div>
                         @enderror
@@ -299,6 +303,7 @@
 
                     <div class="edit-actions">
                         <button type="submit" class="edit-button">Update post</button>
+                        <button type="submit" class="delete-button">Delete</button>
                         <a href="{{ route('posts.show', $post->id) }}" class="edit-link">Open post</a>
                     </div>
                 </form>

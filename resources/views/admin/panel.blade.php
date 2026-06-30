@@ -298,7 +298,7 @@
                     <div class="admin-feed">
                         @forelse ($latestComments as $comment)
                             <div class="admin-feed-item">
-                                <p class="admin-feed-title">{{ $comment->author }}</p>
+                                <p class="admin-feed-title">{{ $comment->user?->name ?? $comment->author }}</p>
                                 <div class="admin-feed-meta">{{ \Illuminate\Support\Str::limit($comment->text, 70) }}</div>
                             </div>
                         @empty

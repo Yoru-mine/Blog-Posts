@@ -5,6 +5,7 @@
 @section('content')
     <style>
         .dashboard-page {
+            position: relative;
             min-height: 100vh;
             padding: 130px 24px 72px;
             background:
@@ -13,7 +14,21 @@
                 linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%);
         }
 
+        .dashboard-backdrop {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(30px) brightness(0.4);
+            transform: scale(1.1);
+            opacity: 0.5;
+            z-index: 0;
+        }
+
         .dashboard-shell {
+            position: relative;
+            z-index: 1;
             max-width: 1280px;
             margin: 0 auto;
             display: grid;
@@ -311,6 +326,9 @@
     </style>
 
     <div class="dashboard-page">
+        <div class="dashboard-backdrop"
+            style="background-image: url('{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('images/default-avatar.svg') }}');">
+        </div>
         <div class="dashboard-shell">
             <section class="dashboard-hero">
                 <div>
@@ -419,4 +437,3 @@
         </div>
     </div>
 @endsection
-

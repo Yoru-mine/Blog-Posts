@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class FileUploadController extends Controller
 {
@@ -17,17 +17,17 @@ class FileUploadController extends Controller
 
         $imageFile = $request->file('file');
 
-        $imageManager = new ImageManager(new Driver());
+        $imageManager = new ImageManager(new Driver);
 
         $image = $imageManager->read($imageFile);
 
         $image->resize(800, 600);
 
         $folder = date('Y/m/d');
-        $filename = time() . '.' . $imageFile->getClientOriginalExtension();
+        $filename = time().'.'.$imageFile->getClientOriginalExtension();
         $fullPath = public_path("uploads/$folder");
 
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             mkdir($fullPath, 0755, true);
         }
 

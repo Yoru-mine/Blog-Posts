@@ -23,3 +23,73 @@ body {
 .navbar-glass .nav-link:hover {
     color: #ccc !important;
 }
+
+.reaction-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    font-size: 1.50rem;
+    transition: background-color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reaction-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.reaction-btn.is-animated {
+    transform: scale(1.15);
+}
+
+.reaction-btn.active {
+    background-color: rgba(255, 255, 255, 0.16);
+    filter: brightness(0.85);
+}
+
+.heart-img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 0;
+}
+
+.reaction-btn-burn {
+    margin-left: 6px;
+}
+
+.reaction-btn-burn .burn-img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 0;
+}
+
+.reaction-btn-lol {
+    margin-left: 6px;
+}
+
+.reaction-btn-lol .lol-img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 0;
+}
+
+.reaction-btn-sad {
+    margin-left: 6px;
+}
+
+.reaction-btn-sad .sad-img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 0;
+}

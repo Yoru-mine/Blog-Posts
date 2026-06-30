@@ -11,11 +11,31 @@
         }
 
         .posts-page {
+            position: relative;
             min-height: calc(100vh - 88px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 64px 0 72px;
+        }
+
+        .posts-backdrop {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(30px) brightness(0.3);
+            transform: scale(1.1);
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .posts-container,
+        .posts-pagination {
+            position: relative;
+            z-index: 1;
         }
 
         .posts-container {
@@ -33,8 +53,8 @@
             display: flex;
             position: relative;
             flex-direction: column;
-            width: 400px;
-            height: 300px;
+            width: 500px;
+            height: 380px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
         }
@@ -119,7 +139,15 @@
         }
     </style>
 
+    @php
+        $bgAvatar =
+            auth()->check() && auth()->user()->avatar
+                ? asset('storage/' . auth()->user()->avatar)
+                : asset('images/default-avatar.svg');
+    @endphp
+
     <div class="posts-page">
+        <div class="posts-backdrop" style="background-image: url('{{ $bgAvatar }}');"></div>
         <div class="posts-container">
             @foreach ($posts as $post)
                 <a href="{{ route('posts.show', $post->id) }}" class="post-card">
