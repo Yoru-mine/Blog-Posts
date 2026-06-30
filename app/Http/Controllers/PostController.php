@@ -165,17 +165,11 @@ class PostController extends Controller
         }
 
         $post->update($data);
-        Cache::flush();
 
-        try {
-            Redis::del('post:all');
-        } catch (\Exception $e) {
-            Log::warning('Redis unavailable in update(): ' . $e->getMessage());
-        }
+        \Illuminate\Support\Facades\Cache::flush();
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
-
     public function destroy(string $id)
     {
         $post = Post::findOrFail($id);
