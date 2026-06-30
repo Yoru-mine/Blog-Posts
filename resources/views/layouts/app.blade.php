@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title')</title>
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
@@ -1243,7 +1246,6 @@
     </button>
 
     <script>
-
         (() => {
             const btnUp = document.getElementById('btn-up');
             if (btnUp) {
