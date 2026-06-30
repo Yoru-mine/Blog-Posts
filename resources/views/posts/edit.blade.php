@@ -301,19 +301,24 @@
                         @enderror
                     </div>
 
-                    <div class="edit-actions">
-                        <button type="submit" class="edit-button">Update post</button>
-
-                        <a href="{{ route('posts.show', $post->id) }}" class="edit-link">Open post</a>
-                    </div>
+                    <div class="edit-actions-row"
+                        style="display: flex; gap: 15px; align-items: center; justify-content: space-between; margin-top: 20px;">
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <button type="submit" class="edit-button" style="margin: 0;">Update post</button>
+                            <a href="{{ route('posts.show', $post->id) }}" class="edit-link">Open post</a>
+                        </div>
                 </form>
-                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="display: inline;"
+                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="margin: 0;"
                     onsubmit="return confirm('Are you sure you want to delete this post?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="delete-button">Delete</button>
+                    <button type="submit" class="delete-button"
+                        style="margin: 0; background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Delete</button>
                 </form>
-            </section>
         </div>
+        </section>
+        </form>
+        </section>
+    </div>
     </div>
 @endsection
