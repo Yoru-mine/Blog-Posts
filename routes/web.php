@@ -1,24 +1,5 @@
 <?php
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-
-Route::get('/create-admin-secretly', function () {
-    $email = 'myavk22@gmail.com';
-
-
-    $adminExists = User::where('email', $email)->exists();
-
-    if (!$adminExists) {
-        User::create([
-            'name' => 'Admin',
-            'email' => $email,
-            'password' => Hash::make('СЮДА_НАПИШИ_СВОЙ_ПАРОЛЬ'), // <-- Впиши свой пароль вместо капса (кавычки оставь)
-        ]);
-        return 'Администратор myavk22@gmail.com успешно создан! Теперь можно входить.';
-    }
-
-    return 'Пользователь с email myavk22@gmail.com уже существует в базе Aiven.';
-});
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileUploadController;
@@ -30,6 +11,24 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/create-admin-secretly', function () {
+    $email = 'myavk22@gmail.com';
+
+    $adminExists = User::where('email', $email)->exists();
+
+    if (!$adminExists) {
+        User::create([
+            'name' => 'Admin',
+            'email' => $email,
+            'password' => Hash::make('AdminNimda12345'),
+        ]);
+        return 'Администратор myavk22@gmail.com успешно создан! Теперь можно входить.';
+    }
+
+    return 'Пользователь с email myavk22@gmail.com уже существует в базе Aiven.';
+});
+
 
 Route::get('/', function () {
     $posts = Post::latest()->take(8)->get();
