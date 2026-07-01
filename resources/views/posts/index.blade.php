@@ -141,9 +141,7 @@
 
     @php
         $bgAvatar =
-            auth()->check() && auth()->user()->avatar
-                ? \Illuminate\Support\Facades\Storage::disk('s3')->url(auth()->user()->avatar)
-                : asset('images/default-avatar.svg');
+            auth()->check() && auth()->user()->avatar ? auth()->user()->avatar : asset('images/default-avatar.svg');
     @endphp
 
     <div class="posts-page">
