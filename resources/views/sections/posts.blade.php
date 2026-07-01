@@ -5,9 +5,9 @@
 
     .posts-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
         gap: 36px;
-        max-width: 1280px;
+        max-width: 1440px;
         margin: 0 auto;
     }
 
@@ -16,7 +16,6 @@
         position: relative;
         flex-direction: column;
         width: 100%;
-        min-height: 300px;
         aspect-ratio: 4 / 3;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.04);
@@ -104,9 +103,9 @@
             <a href="{{ route('posts.show', $post->id) }}" class="post-card">
                 <div class="card">
                     @if ($post->image)
-                        <img src="{{ asset('storage/' . $post->image) }}" class="card-img" alt="{{ $post->title }}">
+                        <img src="{{ $post->image }}" class="card-img" alt="{{ $post->title }}">
                     @else
-                        <img src="/images/default.png" class="card-img" alt="{{ $post->title }}">
+                        <img src="{{ asset('images/default.png') }}" class="card-img" alt="{{ $post->title }}">
                     @endif
 
                     <div class="title2">
