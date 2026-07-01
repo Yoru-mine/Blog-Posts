@@ -36,36 +36,38 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('DEBUG ENDPOINT: ' . config('filesystems.disks.s3.endpoint'));
-        \Log::info('DEBUG ENV RAW: ' . env('AWS_ENDPOINT'));
-
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'image' => 'nullable|image|max:5120',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('image');
+        $data['user_id'] = auth()->id();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('', 's3');
-            if ($path === false || $path === '') {
-                \Illuminate\Support\Facades\Log::error('S3 FAIL: store() вернул false - проверь ключи и endpoint');
+            $image = $request->file('image');
+
+
+            $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
+                'key' => env('IMGBB_API_KEY'),
+                'image' => base64_encode(file_get_contents($image->getRealPath())),
+            ]);
+
+            $result = $response->json();
+
+            if (isset($result['data']['url'])) {
+                $data['image'] = $result['data']['url'];
             } else {
-                $data['image'] = $path;
-                \Illuminate\Support\Facades\Log::info('S3 OK: ' . $path);
+                return back()->withErrors(['image' => 'Ошибка загрузки картинки на сервер.']);
             }
         }
 
-        $data['user_id'] = auth()->id();
-
         Post::create($data);
-
         \Illuminate\Support\Facades\Cache::flush();
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
-
     public function show(string $id)
     {
         $post = \Illuminate\Support\Facades\Cache::remember("posts:show:{$id}", 600, function () use ($id) {
@@ -158,17 +160,24 @@ class PostController extends Controller
 
         $post = Post::findOrFail($id);
         $this->authorizePostAccess($post);
-        $data = $request->all();
+        $data = $request->except('image');
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('', 's3');
-            $data['image'] = $path;
+            $image = $request->file('image');
+            $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
+                'key' => env('IMGBB_API_KEY'),
+                'image' => base64_encode(file_get_contents($image->getRealPath())),
+            ]);
+
+            $result = $response->json();
+            if (isset($result['data']['url'])) {
+                $data['image'] = $result['data']['url'];
+            }
         } else {
             $data['image'] = $post->image;
         }
 
         $post->update($data);
-
         \Illuminate\Support\Facades\Cache::flush();
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
@@ -181,7 +190,6 @@ class PostController extends Controller
         $post->delete();
         \Illuminate\Support\Facades\Cache::flush();
 
-        // Мы полностью убрали блок try/catch с Redis, который вызывал ошибку 500
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }
 
@@ -204,7 +212,7 @@ class PostController extends Controller
                 'id' => $post->id,
                 'title' => $post->title,
                 'excerpt' => \Illuminate\Support\Str::limit($post->content, 80),
-                'image' => $post->image ? Storage::disk('s3')->url($post->image) : asset('images/default.png'),
+                'image' => $post->image ?: asset('images/default.png'),
                 'url' => route('posts.show', $post->id),
             ]);
         });
