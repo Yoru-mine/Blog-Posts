@@ -149,8 +149,7 @@
                         @forelse ($posts as $post)
                             <tr>
                                 <td>
-                                    <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
-                                        alt="{{ $post->title }}"
+                                    <img src="{{ $post->image ?: asset('images/default.png') }}" alt="{{ $post->title }}"
                                         style="width: 64px; height: 48px; object-fit: cover; display: block;">
                                 </td>
                                 <td>{{ $post->title }}</td>
