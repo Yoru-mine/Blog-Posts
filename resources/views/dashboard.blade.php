@@ -327,7 +327,7 @@
 
     <div class="dashboard-page">
         <div class="dashboard-backdrop"
-            style="background-image: url('{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('images/default-avatar.svg') }}');">
+            style="background-image: url('{{ auth()->user()->avatar ? \Illuminate\Support\Facades\Storage::disk('s3')->url(auth()->user()->avatar) : asset('images/default-avatar.svg') }}');">
         </div>
         <div class="dashboard-shell">
             <section class="dashboard-hero">
@@ -392,7 +392,7 @@
                         <div class="recent-posts">
                             @foreach ($recentPosts as $post)
                                 <article class="recent-post">
-                                    <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                                    <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
                                         alt="{{ $post->title }}" class="recent-post-image">
 
                                     <div class="recent-post-content">

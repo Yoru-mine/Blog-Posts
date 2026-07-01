@@ -4,7 +4,9 @@
 
 @section('content')
     @php
-        $avatarUrl = $user->avatar ? asset('storage/' . $user->avatar) : asset('images/default-avatar.svg');
+        $avatarUrl = $user->avatar
+            ? \Illuminate\Support\Facades\Storage::disk('s3')->url($user->avatar)
+            : asset('images/default-avatar.svg');
     @endphp
 
     <style>
@@ -338,6 +340,7 @@
         }
 
         @media (max-width: 1100px) {
+
             .profile-hero,
             .profile-grid {
                 grid-template-columns: 1fr;
@@ -401,7 +404,8 @@
                         <span class="profile-kicker">Account space</span>
                         <h1 class="profile-title">{{ $user->name }}</h1>
                         <p class="profile-copy">
-                            This is your profile page. Here you can update your basic information, change your password, and manage your account without leaving the same atmosphere as the rest of the project.
+                            This is your profile page. Here you can update your basic information, change your password, and
+                            manage your account without leaving the same atmosphere as the rest of the project.
                         </p>
 
                         <div class="profile-hero-actions">
@@ -415,7 +419,8 @@
                     <div class="profile-stats">
                         <div class="profile-stat">
                             <div class="profile-stat-label">Email</div>
-                            <p class="profile-stat-value" style="font-size: 22px; line-height: 1.35;">{{ $user->email }}</p>
+                            <p class="profile-stat-value" style="font-size: 22px; line-height: 1.35;">{{ $user->email }}
+                            </p>
                             <div class="profile-stat-note">The email currently attached to your account.</div>
                         </div>
 
@@ -427,7 +432,8 @@
 
                         <div class="profile-stat">
                             <div class="profile-stat-label">Latest post</div>
-                            <p class="profile-stat-value">{{ $latestPost ? $latestPost->created_at->format('d M') : '—' }}</p>
+                            <p class="profile-stat-value">{{ $latestPost ? $latestPost->created_at->format('d M') : '—' }}
+                            </p>
                             <div class="profile-stat-note">{{ $latestPost ? $latestPost->title : 'No posts yet.' }}</div>
                         </div>
 
@@ -445,13 +451,15 @@
             <div class="profile-grid">
                 <section class="profile-card">
                     <h2 class="profile-card-title">Profile information</h2>
-                    <p class="profile-card-copy">Update your name and email address. These details will be used across your account and future user-facing sections.</p>
+                    <p class="profile-card-copy">Update your name and email address. These details will be used across your
+                        account and future user-facing sections.</p>
 
                     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
                         @csrf
                     </form>
 
-                    <form method="post" action="{{ route('profile.update') }}" class="profile-form" enctype="multipart/form-data">
+                    <form method="post" action="{{ route('profile.update') }}" class="profile-form"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('patch')
 
@@ -459,13 +467,15 @@
                             <label for="avatar" class="profile-label">Avatar</label>
                             <input id="avatar" name="avatar" type="file" class="profile-file-input" accept="image/*">
                             <div class="profile-file-note">
-                                Choose an image here to update both your profile avatar and the blurred background of this page.
+                                Choose an image here to update both your profile avatar and the blurred background of this
+                                page.
                             </div>
                         </div>
 
                         <div class="profile-field">
                             <label for="name" class="profile-label">Name</label>
-                            <input id="name" name="name" type="text" class="profile-input" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
+                            <input id="name" name="name" type="text" class="profile-input"
+                                value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
                             @if ($errors->get('name'))
                                 <div class="profile-error">{{ $errors->first('name') }}</div>
                             @endif
@@ -473,20 +483,23 @@
 
                         <div class="profile-field">
                             <label for="email" class="profile-label">Email</label>
-                            <input id="email" name="email" type="email" class="profile-input" value="{{ old('email', $user->email) }}" required autocomplete="username">
+                            <input id="email" name="email" type="email" class="profile-input"
+                                value="{{ old('email', $user->email) }}" required autocomplete="username">
                             @if ($errors->get('email'))
                                 <div class="profile-error">{{ $errors->first('email') }}</div>
                             @endif
 
-                            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+                            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
                                 <p class="verification-note">
                                     Your email address is unverified.
-                                    <button form="send-verification" class="verification-button">Send verification email again</button>
+                                    <button form="send-verification" class="verification-button">Send verification email
+                                        again</button>
                                 </p>
                             @endif
 
                             @if (session('status') === 'verification-link-sent')
-                                <div class="profile-status">A new verification link has been sent to your email address.</div>
+                                <div class="profile-status">A new verification link has been sent to your email address.
+                                </div>
                             @endif
                         </div>
 
@@ -501,7 +514,8 @@
 
                 <section class="profile-card">
                     <h2 class="profile-card-title">Update password</h2>
-                    <p class="profile-card-copy">Set a stronger password for your account. Use something long and memorable for you, but hard to guess for anyone else.</p>
+                    <p class="profile-card-copy">Set a stronger password for your account. Use something long and memorable
+                        for you, but hard to guess for anyone else.</p>
 
                     <form method="post" action="{{ route('password.update') }}" class="profile-form">
                         @csrf
@@ -509,7 +523,8 @@
 
                         <div class="profile-field">
                             <label for="current_password" class="profile-label">Current password</label>
-                            <input id="current_password" name="current_password" type="password" class="profile-input" autocomplete="current-password">
+                            <input id="current_password" name="current_password" type="password" class="profile-input"
+                                autocomplete="current-password">
                             @if ($errors->updatePassword->get('current_password'))
                                 <div class="profile-error">{{ $errors->updatePassword->first('current_password') }}</div>
                             @endif
@@ -517,7 +532,8 @@
 
                         <div class="profile-field">
                             <label for="password" class="profile-label">New password</label>
-                            <input id="password" name="password" type="password" class="profile-input" autocomplete="new-password">
+                            <input id="password" name="password" type="password" class="profile-input"
+                                autocomplete="new-password">
                             @if ($errors->updatePassword->get('password'))
                                 <div class="profile-error">{{ $errors->updatePassword->first('password') }}</div>
                             @endif
@@ -525,9 +541,11 @@
 
                         <div class="profile-field">
                             <label for="password_confirmation" class="profile-label">Confirm password</label>
-                            <input id="password_confirmation" name="password_confirmation" type="password" class="profile-input" autocomplete="new-password">
+                            <input id="password_confirmation" name="password_confirmation" type="password"
+                                class="profile-input" autocomplete="new-password">
                             @if ($errors->updatePassword->get('password_confirmation'))
-                                <div class="profile-error">{{ $errors->updatePassword->first('password_confirmation') }}</div>
+                                <div class="profile-error">{{ $errors->updatePassword->first('password_confirmation') }}
+                                </div>
                             @endif
                         </div>
 
@@ -542,23 +560,20 @@
 
                 <section class="profile-card profile-card-danger">
                     <h2 class="profile-card-title">Delete account</h2>
-                    <p class="profile-card-copy">This action permanently removes your account. If you decide to continue, enter your current password and confirm the deletion.</p>
+                    <p class="profile-card-copy">This action permanently removes your account. If you decide to continue,
+                        enter your current password and confirm the deletion.</p>
 
-                    <form
-                        method="post"
-                        action="{{ route('profile.destroy') }}"
-                        class="profile-form"
-                        data-confirm
+                    <form method="post" action="{{ route('profile.destroy') }}" class="profile-form" data-confirm
                         data-confirm-title="Delete account?"
                         data-confirm-message="Your account and its access will be removed permanently. Make sure you really want to do this."
-                        data-confirm-button="Delete account"
-                    >
+                        data-confirm-button="Delete account">
                         @csrf
                         @method('delete')
 
                         <div class="profile-field">
                             <label for="delete_password" class="profile-label">Current password</label>
-                            <input id="delete_password" name="password" type="password" class="profile-input" placeholder="Enter your password to confirm">
+                            <input id="delete_password" name="password" type="password" class="profile-input"
+                                placeholder="Enter your password to confirm">
                             @if ($errors->userDeletion->get('password'))
                                 <div class="profile-error">{{ $errors->userDeletion->first('password') }}</div>
                             @endif

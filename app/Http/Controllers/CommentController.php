@@ -43,7 +43,7 @@ class CommentController extends Controller
                     'author' => $comment->user?->name ?? $comment->author,
                     'user_id' => $comment->user_id,
                     'avatar' => $comment->user?->avatar
-                        ? asset('storage/' . $comment->user->avatar)
+                        ? \Illuminate\Support\Facades\Storage::disk('s3')->url($comment->user->avatar)
                         : asset('images/default-avatar.svg'),
                     'profile_url' => $comment->user
                         ? route('users.show', $comment->user)

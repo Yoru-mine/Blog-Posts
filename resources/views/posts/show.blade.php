@@ -633,9 +633,11 @@
     </style>
 
     @php
-        $imageUrl = $post->image ? asset('storage/' . $post->image) : asset('images/default.png');
+        $imageUrl = $post->image
+            ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image)
+            : asset('images/default.png');
         $postAuthorAvatarUrl = $post->user?->avatar
-            ? asset('storage/' . $post->user->avatar)
+            ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->user->avatar)
             : asset('images/default-avatar.svg');
     @endphp
 
@@ -644,7 +646,7 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
                     alt="{{ $post->title }}" class="твои-классы-картинки">
             </div>
 
@@ -706,7 +708,7 @@
                         @foreach ($post->comments as $comment)
                             @php
                                 $commentAvatarUrl = $comment->user?->avatar
-                                    ? asset('storage/' . $comment->user->avatar)
+                                    ? \Illuminate\Support\Facades\Storage::disk('s3')->url($comment->user->avatar)
                                     : asset('images/default-avatar.svg');
                             @endphp
                             <div id="comment-{{ $comment->id }}" class="comment-card" role="article"
@@ -769,8 +771,8 @@
                             @foreach ($similarPosts as $similar)
                                 <a href="{{ route('posts.show', $similar->id) }}" class="similar-card">
                                     @if ($similar->image)
-                                        <img src="{{ asset('storage/' . $similar->image) }}" alt=""
-                                            class="similar-img">
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url($similar->image) }}"
+                                            alt="" class="similar-img">
                                     @endif
                                     <span class="similar-title">{{ $similar->title }}</span>
                                 </a>

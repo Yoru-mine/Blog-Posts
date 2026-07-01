@@ -142,7 +142,7 @@
     @php
         $bgAvatar =
             auth()->check() && auth()->user()->avatar
-                ? asset('storage/' . auth()->user()->avatar)
+                ? \Illuminate\Support\Facades\Storage::disk('s3')->url(auth()->user()->avatar)
                 : asset('images/default-avatar.svg');
     @endphp
 
@@ -153,7 +153,8 @@
                 <a href="{{ route('posts.show', $post->id) }}" class="post-card">
                     <div class="card">
                         @if ($post->image)
-                            <img src="{{ asset('storage/' . $post->image) }}" class="card-img" alt="{{ $post->title }}">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) }}"
+                                class="card-img" alt="{{ $post->title }}">
                         @else
                             <img src="/images/default.png" class="card-img" alt="{{ $post->title }}">
                         @endif

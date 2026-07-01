@@ -4,7 +4,9 @@
 
 @section('content')
     @php
-        $avatarUrl = $user->avatar ? asset('storage/' . $user->avatar) : asset('images/default-avatar.svg');
+        $avatarUrl = $user->avatar
+            ? \Illuminate\Support\Facades\Storage::disk('s3')->url($user->avatar)
+            : asset('images/default-avatar.svg');
     @endphp
 
     <style>
@@ -309,15 +311,18 @@
                         <span class="public-profile-kicker">Public profile</span>
                         <h1 class="public-profile-title">{{ $user->name }}</h1>
                         <p class="public-profile-copy-text">
-                            A personal page inside the project atmosphere. Here you can see the author's public profile, recent posts, and the general mood of their account.
+                            A personal page inside the project atmosphere. Here you can see the author's public profile,
+                            recent posts, and the general mood of their account.
                         </p>
 
                         <div class="public-profile-actions">
                             <a href="{{ route('posts.index') }}" class="public-profile-action">Browse posts</a>
                             @if ($viewer && $viewer->id === $user->id)
-                                <a href="{{ route('profile.edit') }}" class="public-profile-action-secondary">Open your profile</a>
+                                <a href="{{ route('profile.edit') }}" class="public-profile-action-secondary">Open your
+                                    profile</a>
                             @elseif ($latestPost)
-                                <a href="{{ route('posts.show', $latestPost->id) }}" class="public-profile-action-secondary">Open latest post</a>
+                                <a href="{{ route('posts.show', $latestPost->id) }}"
+                                    class="public-profile-action-secondary">Open latest post</a>
                             @endif
                         </div>
                     </div>
@@ -351,7 +356,8 @@
                         <p class="public-profile-stat-value" style="font-size: 22px; line-height: 1.35;">
                             {{ $user->is_admin ? 'Admin' : 'User' }}
                         </p>
-                        <div class="public-profile-stat-note">A simple public label for this account inside the project.</div>
+                        <div class="public-profile-stat-note">A simple public label for this account inside the project.
+                        </div>
                     </div>
                 </div>
             </section>
@@ -369,7 +375,8 @@
                         @foreach ($recentPosts as $post)
                             <a href="{{ route('posts.show', $post->id) }}" class="public-profile-post-card">
                                 <h3 class="public-profile-post-title">{{ $post->title }}</h3>
-                                <p class="public-profile-post-copy">{{ \Illuminate\Support\Str::limit($post->content, 110) }}</p>
+                                <p class="public-profile-post-copy">
+                                    {{ \Illuminate\Support\Str::limit($post->content, 110) }}</p>
                                 <div class="public-profile-post-date">{{ $post->created_at->format('d M Y') }}</div>
                             </a>
                         @endforeach
