@@ -45,7 +45,7 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('', 's3');
+            $path = $request->file('image')->store('images', 's3');
             $data['image'] = $path;
         }
 
