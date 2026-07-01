@@ -644,7 +644,8 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $post->image ? asset($post->image) : asset('images/default.png') }}">
+                <img src="{{ $post->image ? asset('storage/' . $post->image) : asset('images/default.png') }}"
+                    alt="{{ $post->title }}" class="твои-классы-картинки">
             </div>
 
             <div class="post-info-box">
