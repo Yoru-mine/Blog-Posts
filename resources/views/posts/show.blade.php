@@ -771,8 +771,8 @@
                             @foreach ($similarPosts as $similar)
                                 <a href="{{ route('posts.show', $similar->id) }}" class="similar-card">
                                     @if ($similar->image)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url($similar->image) }}"
-                                            alt="" class="similar-img">
+                                        <img src="{{ $post->image ?: asset('images/default.png') }}"
+                                            alt="{{ $post->title }}" class="edit-preview-image">
                                     @endif
                                     <span class="similar-title">{{ $similar->title }}</span>
                                 </a>

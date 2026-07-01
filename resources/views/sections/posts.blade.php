@@ -104,10 +104,9 @@
             <a href="{{ route('posts.show', $post->id) }}" class="post-card">
                 <div class="card">
                     @if ($post->image)
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) }}"
-                            class="card-img" alt="{{ $post->title }}">
+                        <img src="{{ $post->image }}" class="card-img" alt="{{ $post->title }}">
                     @else
-                        <img src="/images/fon.png" class="card-img" alt="{{ $post->title }}">
+                        <img src="{{ asset('images/default.png') }}" class="card-img" alt="{{ $post->title }}">
                     @endif
 
                     <div class="title2">
