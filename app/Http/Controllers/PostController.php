@@ -36,37 +36,19 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'nullable|image|max:5120',
-        ]);
-
+        $request->validate(['title' => 'required', 'content' => 'required', 'image' => 'nullable|image']);
         $data = $request->except('image');
         $data['user_id'] = auth()->id();
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-
-
             $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
                 'key' => env('IMGBB_API_KEY'),
-                'image' => base64_encode(file_get_contents($image->getRealPath())),
+                'image' => base64_encode(file_get_contents($request->file('image')->getRealPath())),
             ]);
-
-            $result = $response->json();
-
-            if (isset($result['data']['url'])) {
-                $data['image'] = $result['data']['url'];
-            } else {
-                return back()->withErrors(['image' => 'Ошибка загрузки картинки на сервер.']);
-            }
+            $data['image'] = $response->json()['data']['url'] ?? null;
         }
-
         Post::create($data);
-        \Illuminate\Support\Facades\Cache::flush();
-
-        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+        return redirect()->route('posts.index');
     }
     public function show(string $id)
     {
@@ -152,35 +134,18 @@ class PostController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'nullable|image|max:5120',
-        ]);
-
         $post = Post::findOrFail($id);
-        $this->authorizePostAccess($post);
         $data = $request->except('image');
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
             $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
                 'key' => env('IMGBB_API_KEY'),
-                'image' => base64_encode(file_get_contents($image->getRealPath())),
+                'image' => base64_encode(file_get_contents($request->file('image')->getRealPath())),
             ]);
-
-            $result = $response->json();
-            if (isset($result['data']['url'])) {
-                $data['image'] = $result['data']['url'];
-            }
-        } else {
-            $data['image'] = $post->image;
+            $data['image'] = $response->json()['data']['url'] ?? $post->image;
         }
-
         $post->update($data);
-        \Illuminate\Support\Facades\Cache::flush();
-
-        return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
+        return redirect()->route('posts.index');
     }
     public function destroy(string $id)
     {
