@@ -45,8 +45,13 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 's3');
-            $data['image'] = $path;
+            try {
+                $path = $request->file('image')->store('images', 's3');
+                $data['image'] = $path;
+                \Illuminate\Support\Facades\Log::info('S3 OK: ' . $path);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('S3 FAIL: ' . $e->getMessage());
+            }
         }
 
         $data['user_id'] = auth()->id();
