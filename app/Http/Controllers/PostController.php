@@ -59,20 +59,18 @@ class PostController extends Controller
 
     public function show(string $id)
     {
-        try {
-            $views = Redis::incr("post:{$id}:views");
-            $likes = (int) Redis::get("post:{$id}:likes");
-        } catch (\Exception $e) {
-            Log::warning('Redis unavailable in show(): ' . $e->getMessage());
-            $views = 0;
-            $likes = 0;
-        }
-
-        $post = Cache::remember("posts:show:{$id}", 600, function () use ($id) {
+        $post = \Illuminate\Support\Facades\Cache::remember("posts:show:{$id}", 600, function () use ($id) {
             return Post::with(['user', 'comments.user'])->findOrFail($id);
         });
 
-        $similarPosts = Cache::remember("posts:similar:{$id}", 600, function () use ($post) {
+
+        $post->increment('views');
+        $views = $post->views ?? 0;
+
+
+        $likes = $post->likes ?? 0;
+
+        $similarPosts = \Illuminate\Support\Facades\Cache::remember("posts:similar:{$id}", 600, function () use ($post) {
             $words = explode(' ', str_replace(['-', '_', '/', '\\'], ' ', $post->title));
             $words = array_filter($words, fn($w) => mb_strlen($w) > 2);
 
@@ -93,7 +91,6 @@ class PostController extends Controller
 
         return view('posts.show', compact('post', 'views', 'likes', 'isLiked', 'similarPosts'));
     }
-
     public function toggleLike(string $id)
     {
         $post = Post::findOrFail($id);
