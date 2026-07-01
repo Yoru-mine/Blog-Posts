@@ -43,8 +43,8 @@ class ProfileController extends Controller
         $request->user()->fill($request->validated());
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $request->user()->avatar = $path;
+            $path = $request->file('image')->store('', 's3');
+            $data['image'] = $path;
         }
 
         if ($request->user()->isDirty('email')) {

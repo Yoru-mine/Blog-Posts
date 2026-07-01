@@ -44,7 +44,7 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('posts', 'public');
+            $path = $request->file('image')->store('', 's3');
             $data['image'] = $path;
         }
 
@@ -152,7 +152,7 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('posts', 'public');
+            $path = $request->file('image')->store('', 's3');
             $data['image'] = $path;
         } else {
             $data['image'] = $post->image;
