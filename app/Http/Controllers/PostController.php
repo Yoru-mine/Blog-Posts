@@ -201,7 +201,7 @@ class PostController extends Controller
                 'id' => $post->id,
                 'title' => $post->title,
                 'excerpt' => \Illuminate\Support\Str::limit($post->content, 80),
-                'image' => $post->image ? Storage::disk('s3')->url($post->image) : asset('images/default.png'),
+                'image' => $post->image ? Storage::disk('s3')->url($post->image) : asset('images/default-avatar.svg'),
                 'url' => route('posts.show', $post->id),
             ]);
         });

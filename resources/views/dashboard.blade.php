@@ -392,7 +392,7 @@
                         <div class="recent-posts">
                             @foreach ($recentPosts as $post)
                                 <article class="recent-post">
-                                    <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
+                                    <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default-avatar.svg') }}"
                                         alt="{{ $post->title }}" class="recent-post-image">
 
                                     <div class="recent-post-content">

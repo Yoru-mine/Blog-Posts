@@ -635,7 +635,7 @@
     @php
         $imageUrl = $post->image
             ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image)
-            : asset('images/default.png');
+            : asset('images/default-avatar.svg');
         $postAuthorAvatarUrl = $post->user?->avatar
             ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->user->avatar)
             : asset('images/default-avatar.svg');
@@ -646,7 +646,7 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
+                <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default-avatar.svg') }}"
                     alt="{{ $post->title }}" class="твои-классы-картинки">
             </div>
 
