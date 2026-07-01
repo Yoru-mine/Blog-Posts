@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -392,8 +392,8 @@
                         <div class="recent-posts">
                             @foreach ($recentPosts as $post)
                                 <article class="recent-post">
-                                    <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
-                                        alt="{{ $post->title }}" class="recent-post-image">
+                                    <img src="{{ $post->image ?: asset('images/default.png') }}" alt="{{ $post->title }}"
+                                        class="recent-post-image">
 
                                     <div class="recent-post-content">
                                         <h3>{{ $post->title }}</h3>
