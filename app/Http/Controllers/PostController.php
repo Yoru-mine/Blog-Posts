@@ -36,6 +36,9 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('DEBUG ENDPOINT: ' . config('filesystems.disks.s3.endpoint'));
+        \Log::info('DEBUG ENV RAW: ' . env('AWS_ENDPOINT'));
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
