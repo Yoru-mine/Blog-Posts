@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class CommentController extends Controller
 {
-    public function index() {}
+    public function index()
+    {
+    }
 
-    public function create(Request $request) {}
+    public function create(Request $request)
+    {
+    }
 
     public function store(Request $request)
     {
@@ -22,9 +27,10 @@ class CommentController extends Controller
         $comment = Comment::create([
             'post_id' => $request->post_id,
             'user_id' => Auth::id(),
-            'author' => Auth::user()->name, 
+            'author' => Auth::user()->name,
             'text' => $request->text,
         ]);
+        Cache::forget("posts:show:{$request->post_id}");
 
         $comment->load('user');
 
@@ -37,7 +43,7 @@ class CommentController extends Controller
                     'author' => $comment->user?->name ?? $comment->author,
                     'user_id' => $comment->user_id,
                     'avatar' => $comment->user?->avatar
-                        ? asset('storage/'.$comment->user->avatar)
+                        ? asset('storage/' . $comment->user->avatar)
                         : asset('images/default-avatar.svg'),
                     'profile_url' => $comment->user
                         ? route('users.show', $comment->user)
@@ -50,21 +56,32 @@ class CommentController extends Controller
         return redirect()->back()->with('success', 'Comment added successfully.');
     }
 
-    public function postComment(string $id) {}
+    public function postComment(string $id)
+    {
+    }
 
-    public function commentInt(string $id) {}
+    public function commentInt(string $id)
+    {
+    }
 
-    public function edit(string $id) {}
+    public function edit(string $id)
+    {
+    }
 
-    public function update(Request $request, string $id) {}
+    public function update(Request $request, string $id)
+    {
+    }
 
     public function destroy(string $id)
     {
         $comment = Comment::findOrFail($id);
-        if (Auth::id() !== $comment->user_id && ! Auth::user()->isAdmin()) {
+        if (Auth::id() !== $comment->user_id && !Auth::user()->isAdmin()) {
             abort(403);
         }
+        $postId = $comment->post_id;
         $comment->delete();
+
+        Cache::forget("posts:show:{$postId}");
 
         if (request()->expectsJson()) {
             return response()->json([
