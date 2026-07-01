@@ -643,8 +643,8 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
-                    alt="{{ $post->title }}" class="твои-классы-картинки">
+                <img src="{{ $post->image ?: asset('images/default.png') }}" alt="{{ $post->title }}"
+                    class="твои-классы-картинки">
             </div>
 
             <div class="post-info-box">
@@ -704,9 +704,7 @@
                     <div class="comments-list">
                         @foreach ($post->comments as $comment)
                             @php
-                                $commentAvatarUrl = $comment->user?->avatar
-                                    ? \Illuminate\Support\Facades\Storage::disk('s3')->url($comment->user->avatar)
-                                    : asset('images/default-avatar.svg');
+                                $commentAvatarUrl = $comment->user?->avatar ?: asset('images/default-avatar.svg');
                             @endphp
                             <div id="comment-{{ $comment->id }}" class="comment-card" role="article"
                                 aria-label="Comment by {{ $comment->user?->name ?? $comment->author }}">
