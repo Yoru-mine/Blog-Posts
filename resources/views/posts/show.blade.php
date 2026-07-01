@@ -1000,7 +1000,7 @@
 
                         input.value = '';
 
-                        card.scrollIntoView({
+                        card.scrollIntoView({   
                             behavior: 'smooth',
                             block: 'nearest'
                         });
