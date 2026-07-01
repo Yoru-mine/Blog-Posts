@@ -256,7 +256,7 @@
 
                 <div class="edit-preview">
                     <div class="edit-preview-label">Current image</div>
-                    <img src="{{ $post->image ? asset($post->image) : asset('images/default.png') }}"
+                    <img src="{{ $post->image ? Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
                         alt="{{ $post->title }}" class="edit-preview-image">
                     <p class="edit-preview-note">
                         This is the image currently attached to the post. You can upload a new one below if you want to

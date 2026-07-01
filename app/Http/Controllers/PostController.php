@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -184,7 +185,6 @@ class PostController extends Controller
             return response()->json([]);
         }
 
-        // Этот кэш теперь гарантированно работает через файловый драйвер (без Redis)
         $results = \Illuminate\Support\Facades\Cache::remember('posts:search:' . mb_strtolower($query), 300, function () use ($query) {
             $posts = Post::where('title', 'LIKE', "%{$query}%")
                 ->orWhere('content', 'LIKE', "%{$query}%")
@@ -196,7 +196,7 @@ class PostController extends Controller
                 'id' => $post->id,
                 'title' => $post->title,
                 'excerpt' => \Illuminate\Support\Str::limit($post->content, 80),
-                'image' => $post->image ? asset('storage/' . $post->image) : asset('images/default.png'),
+                'image' => $post->image ? Storage::disk('s3')->url($post->image) : asset('images/default.png'),
                 'url' => route('posts.show', $post->id),
             ]);
         });
