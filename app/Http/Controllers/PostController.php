@@ -44,9 +44,8 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('uploads/posts'), $imageName);
-            $data['image'] = 'uploads/posts/' . $imageName;
+            $path = $request->file('image')->store('posts', 'public');
+            $data['image'] = $path;
         }
 
         $data['user_id'] = auth()->id();
@@ -159,10 +158,8 @@ class PostController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-
-            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('uploads/posts'), $imageName);
-            $data['image'] = 'uploads/posts/' . $imageName;
+            $path = $request->file('image')->store('posts', 'public');
+            $data['image'] = $path;
         } else {
             $data['image'] = $post->image;
         }
