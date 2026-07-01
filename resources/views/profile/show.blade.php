@@ -4,9 +4,7 @@
 
 @section('content')
     @php
-        $avatarUrl = $user->avatar
-            ? \Illuminate\Support\Facades\Storage::disk('s3')->url($user->avatar)
-            : asset('images/default-avatar.svg');
+        $avatarUrl = $user->avatar ? $user->avatar : asset('images/default-avatar.svg');
     @endphp
 
     <style>

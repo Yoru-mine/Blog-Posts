@@ -40,18 +40,27 @@ class ProfileController extends Controller
 
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('image')->store('', 's3');
-            $data['image'] = $path;
+            // Загрузка через ImgBB API
+            $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
+                'key' => env('IMGBB_API_KEY'),
+                'image' => base64_encode(file_get_contents($request->file('avatar')->getRealPath())),
+            ]);
+
+            if ($response->successful()) {
+                $user->avatar = $response->json()['data']['url'];
+            }
         }
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
+
         \Illuminate\Support\Facades\Cache::flush();
-        $request->user()->save();
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

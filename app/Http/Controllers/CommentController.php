@@ -42,12 +42,9 @@ class CommentController extends Controller
                     'text' => $comment->text,
                     'author' => $comment->user?->name ?? $comment->author,
                     'user_id' => $comment->user_id,
-                    'avatar' => $comment->user?->avatar
-                        ? \Illuminate\Support\Facades\Storage::disk('s3')->url($comment->user->avatar)
-                        : asset('images/default-avatar.svg'),
-                    'profile_url' => $comment->user
-                        ? route('users.show', $comment->user)
-                        : null,
+                    // ИСПРАВЛЕНО: просто возвращаем URL из БД или дефолтную картинку
+                    'avatar' => $comment->user?->avatar ?: asset('images/default-avatar.svg'),
+                    'profile_url' => $comment->user ? route('users.show', $comment->user) : null,
                     'created_at' => $comment->created_at->diffForHumans(),
                 ],
             ]);
@@ -55,7 +52,6 @@ class CommentController extends Controller
 
         return redirect()->back()->with('success', 'Comment added successfully.');
     }
-
     public function postComment(string $id)
     {
     }
