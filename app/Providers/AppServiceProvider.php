@@ -15,6 +15,18 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
 use Psr\Http\Message\RequestInterface;
 
+class SupabaseFilesystemAdapter extends FilesystemAdapter
+{
+    public function url($path)
+    {
+        if (isset($this->config['url'])) {
+            return rtrim($this->config['url'], '/') . '/' . ltrim($path, '/');
+        }
+
+        return parent::url($path);
+    }
+}
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -58,7 +70,7 @@ class AppServiceProvider extends ServiceProvider
 
             $adapter = new AwsS3V3Adapter($client, $config['bucket']);
 
-            return new FilesystemAdapter(
+            return new SupabaseFilesystemAdapter(
                 new FlysystemFilesystem($adapter),
                 $adapter,
                 $config
