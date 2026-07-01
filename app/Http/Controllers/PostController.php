@@ -63,12 +63,9 @@ class PostController extends Controller
             return Post::with(['user', 'comments.user'])->findOrFail($id);
         });
 
+        $views = 0;
 
-        $post->increment('views');
-        $views = $post->views ?? 0;
-
-
-        $likes = $post->likes ?? 0;
+        $likes = 0;
 
         $similarPosts = \Illuminate\Support\Facades\Cache::remember("posts:similar:{$id}", 600, function () use ($post) {
             $words = explode(' ', str_replace(['-', '_', '/', '\\'], ' ', $post->title));
