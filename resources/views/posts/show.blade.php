@@ -521,115 +521,115 @@
             }
         }
 
-            .char-counter {
-                font-size: 13px;
-                color: rgba(255, 255, 255, 0.48);
-                text-align: right;
-                width: 100%;
-                margin-top: -10px;
-            }
+        .char-counter {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.48);
+            text-align: right;
+            width: 100%;
+            margin-top: -10px;
+        }
 
-            .char-counter.is-over {
-                color: #ff9a9a;
-            }
+        .char-counter.is-over {
+            color: #ff9a9a;
+        }
 
-            .share-button {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 8px;
-                color: var(--text-main);
-                opacity: 0.8;
-                transition: transform 0.18s ease, opacity 0.2s ease;
-            }
+        .share-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--text-main);
+            opacity: 0.8;
+            transition: transform 0.18s ease, opacity 0.2s ease;
+        }
 
-            .share-button:hover,
-            .share-button:focus-visible {
-                transform: scale(1.12);
-                opacity: 1;
-                outline: none;
-            }
+        .share-button:hover,
+        .share-button:focus-visible {
+            transform: scale(1.12);
+            opacity: 1;
+            outline: none;
+        }
 
-            .share-button:active {
-                transform: scale(0.92);
-            }
+        .share-button:active {
+            transform: scale(0.92);
+        }
 
-            .share-icon {
-                display: block;
-                width: 28px;
-                height: 28px;
-                color: var(--text-main);
-            }
+        .share-icon {
+            display: block;
+            width: 28px;
+            height: 28px;
+            color: var(--text-main);
+        }
 
-            .share-toast {
-                position: fixed;
-                bottom: 40px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(24, 24, 24, 0.95);
-                color: #f4f4f4;
-                padding: 12px 24px;
-                border: 1px solid rgba(255, 255, 255, 0.12);
-                font-size: 14px;
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.3s ease, transform 0.3s ease;
-                z-index: 1600;
-            }
+        .share-toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 24, 0.95);
+            color: #f4f4f4;
+            padding: 12px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1600;
+        }
 
-            .share-toast.is-visible {
-                opacity: 1;
-                transform: translateX(-50%) translateY(-8px);
-            }
+        .share-toast.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-8px);
+        }
 
-            .similar-posts {
-                margin-top: 40px;
-                border-top: 1px solid rgba(255, 255, 255, 0.08);
-                padding-top: 28px;
-            }
+        .similar-posts {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 28px;
+        }
 
-            .similar-posts h4 {
-                font-size: 28px;
-                margin: 0 0 18px;
-            }
+        .similar-posts h4 {
+            font-size: 28px;
+            margin: 0 0 18px;
+        }
 
-            .similar-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-                gap: 16px;
-            }
+        .similar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
 
-            .similar-card {
-                display: grid;
-                gap: 10px;
-                padding: 14px;
-                text-decoration: none;
-                background: rgba(255, 255, 255, 0.04);
-                border: 1px solid rgba(255, 255, 255, 0.06);
-                color: inherit;
-                transition: transform 0.2s ease, background 0.2s ease;
-            }
+        .similar-card {
+            display: grid;
+            gap: 10px;
+            padding: 14px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: inherit;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
 
-            .similar-card:hover {
-                transform: translateY(-2px);
-                background: rgba(255, 255, 255, 0.08);
-            }
+        .similar-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+        }
 
-            .similar-img {
-                width: 100%;
-                height: 140px;
-                object-fit: cover;
-                display: block;
-            }
+        .similar-img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            display: block;
+        }
 
-            .similar-title {
-                font-size: 15px;
-                line-height: 1.4;
-                color: rgba(255, 255, 255, 0.88);
-            }
+        .similar-title {
+            font-size: 15px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.88);
+        }
     </style>
 
     @php
@@ -644,7 +644,7 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $imageUrl }}" alt="Post image" class="post-image" loading="lazy">
+                <img src="{{ $post->image ? asset($post->image) : asset('images/default.png') }}">
             </div>
 
             <div class="post-info-box">
@@ -667,15 +667,12 @@
                     </form>
                     <button class="share-button" id="share-button" aria-label="Share post">
                         <svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
-                                fill="none" stroke="currentColor" stroke-width="1.8"
-                                stroke-linecap="round" stroke-linejoin="round"/>
-                            <polyline points="16 6 12 2 8 6"
-                                fill="none" stroke="currentColor" stroke-width="1.8"
-                                stroke-linecap="round" stroke-linejoin="round"/>
-                            <line x1="12" y1="2" x2="12" y2="15"
-                                stroke="currentColor" stroke-width="1.8"
-                                stroke-linecap="round"/>
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" fill="none" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <polyline points="16 6 12 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                            <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" />
                         </svg>
                     </button>
                     <div class="share-toast" id="share-toast">Link copied!</div>
@@ -771,7 +768,8 @@
                             @foreach ($similarPosts as $similar)
                                 <a href="{{ route('posts.show', $similar->id) }}" class="similar-card">
                                     @if ($similar->image)
-                                        <img src="{{ asset('storage/' . $similar->image) }}" alt="" class="similar-img">
+                                        <img src="{{ asset('storage/' . $similar->image) }}" alt=""
+                                            class="similar-img">
                                     @endif
                                     <span class="similar-title">{{ $similar->title }}</span>
                                 </a>
