@@ -327,7 +327,7 @@
 
     <div class="dashboard-page">
         <div class="dashboard-backdrop"
-            style="background-image: url('{{ auth()->user()->avatar ? \Illuminate\Support\Facades\Storage::disk('s3')->url(auth()->user()->avatar) : asset('images/default-avatar.svg') }}');">
+            style="background-image: url('{{ auth()->user()->avatar ?? asset('images/default-avatar.png') }}')">
         </div>
         <div class="dashboard-shell">
             <section class="dashboard-hero">
