@@ -643,7 +643,8 @@
 
         <div class="post-container" role="main">
             <div class="img-box">
-                <img src="{{ $post->image ?: asset('images/default.png') }}" alt="{{ $post->title }}">
+                <img src="{{ $post->image ? \Illuminate\Support\Facades\Storage::disk('s3')->url($post->image) : asset('images/default.png') }}"
+                    alt="{{ $post->title }}" class="твои-классы-картинки">
             </div>
 
             <div class="post-info-box">
@@ -767,8 +768,8 @@
                             @foreach ($similarPosts as $similar)
                                 <a href="{{ route('posts.show', $similar->id) }}" class="similar-card">
                                     @if ($similar->image)
-                                        <img src="{{ $post->image ?: asset('images/default.png') }}"
-                                            alt="{{ $post->title }}" class="edit-preview-image">
+                                        <img src="{{ $similar->image ?: asset('images/default.png') }}"
+                                            alt="{{ $similar->title }}" class="similar-img">
                                     @endif
                                     <span class="similar-title">{{ $similar->title }}</span>
                                 </a>
