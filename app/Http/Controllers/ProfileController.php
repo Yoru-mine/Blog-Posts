@@ -41,10 +41,9 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        $user->fill($request->validated());
+        $user->fill($request->safe()->except('avatar'));
 
         if ($request->hasFile('avatar')) {
-            // Загрузка через ImgBB API
             $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
                 'key' => env('IMGBB_API_KEY'),
                 'image' => base64_encode(file_get_contents($request->file('avatar')->getRealPath())),
@@ -52,6 +51,9 @@ class ProfileController extends Controller
 
             if ($response->successful()) {
                 $user->avatar = $response->json()['data']['url'];
+            } else {
+                return Redirect::route('profile.edit')
+                    ->withErrors(['avatar' => 'Failed to upload avatar. Please try again.']);
             }
         }
 

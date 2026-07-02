@@ -4,7 +4,7 @@
 
 @section('content')
     @php
-        $avatarUrl = $user->avatar ? $user->avatar : asset('images/default-avatar.svg');
+        $avatarUrl = $user->avatar ? $user->avatar : asset('public/images/default-avatar.svg');
     @endphp
 
     <style>
