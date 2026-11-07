@@ -13,8 +13,7 @@ return [
     |
     */
 
-    'default' => 's3',
-
+    'default' => env('FILESYSTEM_DISK', 'local'),
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

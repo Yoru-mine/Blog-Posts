@@ -12,54 +12,157 @@
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
     <style>
-        html {
-            scroll-behavior: smooth;
+        /* Lenis: обязательные стили (native smooth scroll конфликтует с Lenis) */
+        html.lenis,
+        html.lenis body {
+            height: auto;
         }
 
-        :root {
-            --page-bg: #2b2b2b;
-            --surface: #323232;
-            --surface-soft: rgba(255, 255, 255, 0.08);
-            --surface-line: rgba(255, 255, 255, 0.14);
-            --text-main: #f4f4f4;
-            --text-muted: #b5b5b5;
-            --shadow-soft: 0 22px 80px rgba(0, 0, 0, 0.28);
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
 
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-smooth iframe {
+            pointer-events: none;
+        }
+
+        /* ===== Палитра и токены: все цвета страниц берутся отсюда ===== */
+        :root {
+            /* фон и поверхности: нейтральный серый, почти чёрный, без цветного оттенка */
+            --page-bg: #0b0b0b;
+            --surface: #121212;
+            --surface-2: #181818;
+            --surface-3: #202020;
+            --surface-soft: rgba(255, 255, 255, 0.05);
+            --surface-hover: rgba(255, 255, 255, 0.09);
+            --surface-line: rgba(255, 255, 255, 0.06);
+            /* только для совместимости со старыми страницами */
+
+            /* текст */
+            --text-main: #e6e6e6;
+            --text-muted: #a0a0a0;
+
+            /* приглушённый акцент (молочно-серый), опасное действие, успех */
+            --accent: #d4d2cc;
+            --accent-hover: #e3e1dc;
+            --accent-rgb: 212, 210, 204;
+            --accent-contrast: #161616;
+            --danger: #cc7f78;
+            --danger-hover: #d8928b;
+            --danger-rgb: 204, 127, 120;
+            --danger-contrast: #1c0e0c;
+            --success: #92ad92;
+            --success-rgb: 146, 173, 146;
+
+            /* полупрозрачные слои */
+            --nav-bg: rgba(11, 11, 11, 0.72);
+            --nav-bar-bg: rgba(14, 14, 14, 0.94);
+            --overlay-bg: rgba(0, 0, 0, 0.7);
+
+            /* тени вместо границ */
+            --shadow-soft: 0 22px 80px rgba(0, 0, 0, 0.6);
+            --shadow-raise: 0 12px 32px rgba(0, 0, 0, 0.55);
+            --shadow-nav: 0 12px 36px rgba(0, 0, 0, 0.45);
+
+            /* мягкое свечение от акцента (только text-shadow у текста) */
+            --glow-faint: 0 0 8px rgba(var(--accent-rgb), 0.1);
+            --glow: 0 0 12px rgba(var(--accent-rgb), 0.28);
+            --glow-hover: 0 0 8px rgba(var(--accent-rgb), 0.4), 0 0 20px rgba(var(--accent-rgb), 0.45);
+            --box-glow: 0 0 22px rgba(var(--accent-rgb), 0.16);
+
+            /* углы всегда острые */
+            --btn-h: 44px;
+            --btn-pad: 0 20px;
+            --btn-radius: 0;
+            --card-radius: 0;
+
+            /* фон «пустоты»: лёгкая аура сверху, глубина по краям, статичное зерно */
+            --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+            --void: radial-gradient(110% 65% at 50% -12%, rgba(var(--accent-rgb), 0.05) 0%, transparent 62%),
+                radial-gradient(70% 50% at 100% 105%, rgba(var(--accent-rgb), 0.03) 0%, transparent 70%),
+                radial-gradient(150% 105% at 50% 45%, transparent 50%, rgba(0, 0, 0, 0.75) 100%);
+
+            --icon-filter: brightness(0) invert(1);
         }
 
         [data-theme="lighter"] {
-            --page-bg: #8f8383;
-            --surface: #a09494;
+            --page-bg: #cfcfcf;
+            --surface: #dcdcdc;
+            --surface-2: #e6e6e6;
+            --surface-3: #efefef;
             --surface-soft: rgba(0, 0, 0, 0.06);
-            --surface-line: rgba(0, 0, 0, 0.1);
-            --text-main: #2a2424;
-            --text-muted: #6b5e5e;
-            --shadow-soft: 0 22px 80px rgba(0, 0, 0, 0.12);
-        }
+            --surface-hover: rgba(0, 0, 0, 0.1);
+            --surface-line: rgba(0, 0, 0, 0.08);
 
-        * {
-            transition: background-color 0.5s ease,
-                color 0.4s ease,
-                border-color 0.4s ease,
-                box-shadow 0.4s ease;
+            --text-main: #151515;
+            --text-muted: #4a4a4a;
+
+            --accent: #3f3f3f;
+            --accent-hover: #2a2a2a;
+            --accent-rgb: 63, 63, 63;
+            --accent-contrast: #f2f2f2;
+            --danger: #9a3b35;
+            --danger-hover: #82302b;
+            --danger-rgb: 154, 59, 53;
+            --danger-contrast: #f8eceb;
+            --success: #4a6b4a;
+            --success-rgb: 74, 107, 74;
+
+            --nav-bg: rgba(207, 207, 207, 0.78);
+            --nav-bar-bg: rgba(220, 220, 220, 0.96);
+            --overlay-bg: rgba(20, 20, 20, 0.45);
+
+            --shadow-soft: 0 22px 80px rgba(0, 0, 0, 0.2);
+            --shadow-raise: 0 12px 32px rgba(0, 0, 0, 0.18);
+            --shadow-nav: 0 8px 28px rgba(0, 0, 0, 0.14);
+
+            --glow-faint: 0 0 8px rgba(var(--accent-rgb), 0.06);
+            --glow: 0 0 10px rgba(var(--accent-rgb), 0.16);
+            --glow-hover: 0 0 8px rgba(var(--accent-rgb), 0.24), 0 0 18px rgba(var(--accent-rgb), 0.28);
+            --box-glow: 0 0 20px rgba(var(--accent-rgb), 0.14);
+
+            --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+            --void: radial-gradient(110% 65% at 50% -12%, rgba(var(--accent-rgb), 0.04) 0%, transparent 62%),
+                radial-gradient(70% 50% at 100% 105%, rgba(var(--accent-rgb), 0.03) 0%, transparent 70%),
+                radial-gradient(150% 105% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.14) 100%);
+
+            --icon-filter: brightness(0);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            transition: background-color 0.5s ease,
+                color 0.4s ease,
+                box-shadow 0.4s ease,
+                text-shadow 0.4s ease;
         }
 
-        html,
-        body {
+        html {
             overflow-x: hidden;
+        }
+
+        body {
+            overflow-x: clip;
         }
 
         body {
             margin: 0;
             min-height: 100vh;
             font-family: 'IBM Plex Mono';
+            font-size: 16px;
             background-color: var(--page-bg);
+            background-image: var(--void), var(--grain);
+            background-attachment: fixed;
             color: var(--text-main);
             width: 100%;
         }
@@ -68,6 +171,59 @@
             scroll-margin-top: 108px;
         }
 
+        /* Видимый фокус с клавиатуры для всех интерактивных элементов */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        /* ===== Единая база для всех кнопок ===== */
+        .confirm-button,
+        .confirm-button-danger,
+        .btn-logout,
+        .btn-search,
+        .btn-theme-toggle,
+        .burger,
+        .flash-close,
+        .btn-up,
+        .pagination a,
+        .pagination span,
+        .user-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: var(--btn-h);
+            min-height: var(--btn-h);
+            padding: var(--btn-pad);
+            border: 0;
+            background: var(--surface-soft);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.2;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease,
+                transform 0.2s ease, opacity 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .confirm-button:hover,
+        .confirm-button-danger:hover,
+        .btn-logout:hover,
+        .btn-search:hover,
+        .btn-theme-toggle:hover,
+        .burger:hover,
+        .flash-close:hover,
+        .btn-up:hover,
+        .pagination a:hover,
+        .user-trigger:hover,
+        .user-menu.is-open .user-trigger {
+            background: var(--surface-hover);
+        }
+
+        /* ===== Верхнее меню ===== */
         .main-menu {
             position: fixed;
             top: 0;
@@ -78,10 +234,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 24px 48px;
-            background-color: rgba(26, 26, 26, 0.55);
+            background-color: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-nav);
         }
 
         .menu-left {
@@ -91,27 +247,38 @@
         }
 
         .brand-title {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--btn-h);
             font-size: clamp(20px, 5vw, 32px);
             font-weight: bold;
             letter-spacing: 0.02em;
             color: var(--text-main);
             text-decoration: none;
             line-height: 1;
+            text-shadow: var(--glow);
+            transition: text-shadow 0.25s ease, color 0.25s ease;
+        }
+
+        .brand-title:hover {
+            text-shadow: var(--glow-hover);
         }
 
         .btn-back {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--btn-h);
             color: var(--text-main);
             text-decoration: none;
             font-weight: 600;
             font-size: 24px;
             line-height: 1;
-            opacity: 0.92;
-            transition: opacity 0.25s ease, color 0.25s ease;
+            text-shadow: var(--glow);
+            transition: text-shadow 0.25s ease, color 0.25s ease;
         }
 
         .btn-back:hover {
-            color: #fff;
-            opacity: 1;
+            text-shadow: var(--glow-hover);
         }
 
         .menu-links {
@@ -119,28 +286,45 @@
             list-style: none;
             margin: 0;
             padding: 0;
-            gap: 28px;
+            gap: 8px;
             margin-left: -6px;
         }
 
         .menu-links a,
         .btn-profile {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--btn-h);
+            padding: 0 14px;
             color: var(--text-main);
             text-decoration: none;
             font-weight: 600;
-            font-size: 14px;
-            opacity: 0.92;
-            transition: opacity 0.25s ease, color 0.25s ease, transform 0.25s ease;
+            font-size: 16px;
+            text-shadow: var(--glow);
+            transition: background-color 0.25s ease, color 0.25s ease, text-shadow 0.25s ease, transform 0.25s ease;
         }
 
         .menu-links a:hover,
         .btn-profile:hover {
-            color: #fff;
-            opacity: 1;
+            background: var(--surface-soft);
+            text-shadow: var(--glow-hover);
         }
 
-        .btn-profile:hover {
-            transform: translateY(-1px);
+        /* Главное действие меню: единственная залитая кнопка */
+        .menu-links a.menu-cta {
+            justify-content: center;
+            padding: var(--btn-pad);
+            background: var(--accent);
+            color: var(--accent-contrast);
+            font-size: 15px;
+            font-weight: 700;
+            text-shadow: none;
+        }
+
+        .menu-links a.menu-cta:hover {
+            background: var(--accent-hover);
+            color: var(--accent-contrast);
+            text-shadow: none;
         }
 
         .content {
@@ -150,6 +334,7 @@
             color: var(--text-main);
         }
 
+        /* ===== Flash-сообщения ===== */
         .flash-stack {
             position: fixed;
             top: 96px;
@@ -162,11 +347,9 @@
 
         .flash-message {
             position: relative;
-            padding: 16px 18px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(24, 24, 24, 0.92);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+            padding: 16px 56px 20px 18px;
+            background: var(--surface-3);
+            box-shadow: var(--shadow-raise);
             overflow: hidden;
             animation: flash-enter 0.34s ease;
         }
@@ -178,67 +361,62 @@
             bottom: 0;
             width: 100%;
             height: 3px;
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(var(--accent-rgb), 0.5);
             transform-origin: left center;
             animation: flash-timer 4.8s linear forwards;
         }
 
         .flash-message.is-success::after {
-            background: rgba(212, 237, 196, 0.9);
+            background: var(--success);
         }
 
         .flash-message.is-error::after {
-            background: rgba(241, 167, 167, 0.95);
+            background: var(--danger);
         }
 
         .flash-label {
             display: inline-block;
-            margin-bottom: 8px;
-            font-size: 11px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.52);
+            margin-bottom: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: var(--glow);
+        }
+
+        .flash-message.is-success .flash-label {
+            color: var(--success);
+            text-shadow: 0 0 12px rgba(var(--success-rgb), 0.5);
+        }
+
+        .flash-message.is-error .flash-label {
+            color: var(--danger);
+            text-shadow: 0 0 12px rgba(var(--danger-rgb), 0.5);
         }
 
         .flash-copy {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.7;
             color: var(--text-main);
         }
 
-        .flash-message.is-error .flash-copy {
-            color: #ffd9d9;
-        }
-
-        .flash-message.is-success .flash-copy {
-            color: #eef5e6;
-        }
-
         .flash-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 28px;
-            height: 28px;
-            border: none;
+            top: 6px;
+            right: 6px;
+            width: var(--btn-h);
+            height: var(--btn-h);
+            padding: 0;
             background: transparent;
-            color: rgba(255, 255, 255, 0.68);
-            font: inherit;
-            font-size: 18px;
+            color: var(--text-muted);
+            font-size: 22px;
             line-height: 1;
-            cursor: pointer;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
-        .flash-close:hover {
-            opacity: 1;
-            transform: scale(1.06);
         }
 
         .flash-message.is-leaving {
             animation: flash-leave 0.24s ease forwards;
         }
 
+        /* ===== Диалог подтверждения ===== */
         .confirm-overlay {
             position: fixed;
             inset: 0;
@@ -247,7 +425,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: rgba(8, 8, 8, 0.58);
+            background: var(--overlay-bg);
             backdrop-filter: blur(10px);
             opacity: 0;
             pointer-events: none;
@@ -261,10 +439,9 @@
 
         .confirm-dialog {
             width: min(460px, 100%);
-            padding: 26px 24px 24px;
-            background: rgba(24, 24, 24, 0.96);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34);
+            padding: 28px 24px 24px;
+            background: var(--surface-3);
+            box-shadow: var(--shadow-soft);
             transform: translateY(8px) scale(0.98);
             transition: transform 0.2s ease;
         }
@@ -273,26 +450,18 @@
             transform: translateY(0) scale(1);
         }
 
-        .confirm-kicker {
-            display: inline-block;
-            margin-bottom: 12px;
-            font-size: 11px;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
         .confirm-title {
             margin: 0 0 12px;
             font-size: 28px;
             line-height: 1.15;
+            text-shadow: var(--glow);
         }
 
         .confirm-copy {
             margin: 0;
-            font-size: 15px;
+            font-size: 16px;
             line-height: 1.75;
-            color: rgba(255, 255, 255, 0.74);
+            color: var(--text-muted);
         }
 
         .confirm-actions {
@@ -303,35 +472,16 @@
             flex-wrap: wrap;
         }
 
-        .confirm-button,
         .confirm-button-danger {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 46px;
-            padding: 0 18px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            background: var(--danger);
+            color: var(--danger-contrast);
         }
 
-        .confirm-button-danger {
-            background: rgba(255, 214, 214, 0.92);
-            color: #3a1b1b;
-            border-color: transparent;
-        }
-
-        .confirm-button:hover,
         .confirm-button-danger:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
+            background: var(--danger-hover);
         }
 
+        /* ===== Пагинация ===== */
         .pagination-shell {
             display: flex;
             justify-content: center;
@@ -352,37 +502,17 @@
             list-style: none;
         }
 
-        .pagination a,
         .pagination span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 42px;
-            min-height: 42px;
-            padding: 0 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
-        }
-
-        .pagination a:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
-            background: rgba(255, 255, 255, 0.1);
+            cursor: default;
         }
 
         .pagination .active span {
-            background: #f2ede2;
-            color: #1E1E1E;
-            border-color: transparent;
+            background: var(--accent);
+            color: var(--accent-contrast);
         }
 
         .pagination .disabled span {
-            opacity: 0.42;
+            opacity: 0.5;
         }
 
         @keyframes flash-enter {
@@ -419,67 +549,36 @@
             }
         }
 
+        /* ===== Выход и иконки меню ===== */
         .btn-logout {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            opacity: 0.92;
-            transition: opacity 0.25s ease, color 0.25s ease;
+            background: rgba(var(--danger-rgb), 0.14);
+            color: var(--danger);
         }
 
         .btn-logout:hover {
-            color: #fff;
-            opacity: 1;
+            background: rgba(var(--danger-rgb), 0.26);
+            color: var(--danger);
         }
 
-        .btn-search {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 18px;
-            cursor: pointer;
-            opacity: 0.92;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+        .btn-search,
+        .btn-theme-toggle {
+            width: var(--btn-h);
             padding: 0;
+            background: transparent;
+            font-size: 18px;
             line-height: 1;
         }
 
         .btn-theme-toggle {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 18px;
-            cursor: pointer;
-            opacity: 0.92;
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            padding: 0;
-            line-height: 1;
-            margin-left: 8px;
-        }
-
-        .btn-theme-toggle:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-
-        .btn-search:hover {
-            opacity: 1;
-            transform: scale(1.1);
+            margin-left: 4px;
         }
 
         .burger {
             display: none;
             flex-direction: column;
             gap: 5px;
+            padding: 0;
             background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
         }
 
         .burger span {
@@ -487,6 +586,7 @@
             width: 24px;
             height: 2px;
             background: var(--text-main);
+            box-shadow: var(--glow-faint);
             transition: transform .25s ease, opacity .2s ease;
         }
 
@@ -532,13 +632,11 @@
                 width: min(78vw, 320px);
                 height: 100dvh;
                 flex-direction: column;
-                gap: 0 !important;
+                gap: 4px !important;
                 margin: 0;
-                padding: 96px 24px 24px;
-                background: rgba(20, 20, 20, 0.97);
-                backdrop-filter: blur(14px);
-                border-left: 1px solid rgba(255, 255, 255, 0.1);
-                box-shadow: -16px 0 48px rgba(0, 0, 0, 0.35);
+                padding: 96px 16px 24px;
+                background: var(--surface-2);
+                box-shadow: -16px 0 48px rgba(0, 0, 0, 0.45);
                 overflow-y: auto;
                 transform: translateX(100%);
                 transition: transform 0.3s ease;
@@ -557,11 +655,17 @@
             .btn-logout,
             .btn-search,
             .btn-theme-toggle {
-                display: block;
+                display: flex;
+                justify-content: flex-start;
                 width: 100%;
-                padding: 12px 0;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-                font-size: 16px !important;
+                min-height: 48px;
+                padding: 0 14px;
+                margin-left: 0;
+                font-size: 16px;
+            }
+
+            .menu-links a.menu-cta {
+                justify-content: center;
             }
 
             .menu-backdrop {
@@ -579,6 +683,129 @@
                 pointer-events: auto;
             }
         }
+
+        /* ===== User dropdown: горизонтальная панель под меню ===== */
+        .menu-links a.is-active {
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: 2px;
+            text-underline-offset: 8px;
+            text-shadow: var(--glow-hover);
+        }
+
+        .user-bar-label {
+            display: none;
+        }
+
+        @media (min-width: 901px) {
+            .menu-links {
+                align-items: center;
+            }
+
+            .menu-tools {
+                display: flex;
+                align-items: center;
+            }
+
+            .user-trigger {
+                gap: 10px;
+                padding: 4px 16px 4px 4px;
+                font-size: 15px;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+
+            .user-avatar--letter {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--accent);
+                color: var(--accent-contrast);
+                font-size: 15px;
+                font-weight: 700;
+            }
+
+            .user-name {
+                max-width: 140px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .user-chevron {
+                transition: transform 0.25s ease;
+            }
+
+            .user-menu.is-open .user-chevron {
+                transform: rotate(180deg);
+            }
+
+            /* li.user-menu НЕ position:relative, поэтому панель
+               привязывается к .main-menu (fixed) и растягивается на всю его ширину */
+            .user-bar {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 12px;
+                padding: 14px 48px;
+                background: var(--nav-bar-bg);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                box-shadow: var(--shadow-nav);
+                clip-path: inset(0 0 100% 0);
+                visibility: hidden;
+                transition: clip-path 0.28s ease, visibility 0s linear 0.28s;
+            }
+
+            .user-menu.is-open .user-bar {
+                clip-path: inset(0 -60px -60px -60px);
+                visibility: visible;
+                transition: clip-path 0.28s ease, visibility 0s;
+            }
+
+            /* выход отделён от остальных действий отступом и цветом */
+            .user-bar form {
+                margin-left: 28px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .user-trigger {
+                display: none;
+            }
+
+            .user-menu {
+                margin-top: 16px;
+                padding: 8px;
+                background: var(--surface-soft);
+            }
+
+            .user-bar {
+                display: block;
+                width: 100%;
+            }
+
+            .user-bar-label {
+                display: block;
+                padding: 8px 14px;
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--text-muted);
+            }
+
+            .user-bar .btn-logout {
+                margin-top: 12px;
+            }
+        }
     </style>
 </head>
 
@@ -588,11 +815,6 @@
         $homeUrl = route('home');
         $postsAnchor = route('posts.index');
         $aboutAnchor = request()->routeIs('home') ? '#home-about' : $homeUrl . '#home-about';
-        $createAnchor = auth()->check()
-            ? route('posts.create')
-            : (request()->routeIs('home')
-                ? '#home-create-post'
-                : $homeUrl . '#home-create-post');
         $footerAnchor = request()->routeIs('home') ? '#home-footer' : $homeUrl . '#home-footer';
     @endphp
 
@@ -616,39 +838,65 @@
 
 
 
-        <ul class="menu-links">
-            <li>
+        <ul class="menu-links" data-lenis-prevent>
+            <li class="menu-tools">
                 <button class="btn-search" id="open-search" aria-label="Search">
                     <img src="{{ asset('images/search.svg') }}" class="search-icon-menu" alt="Search">
                 </button>
                 <button class="btn-theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                     <img src="{{ asset('images/theme.svg') }}" class="theme-icon-menu" alt="Theme">
                 </button>
-
             </li>
-            <li><a href="{{ $postsAnchor }}">Posts</a></li>
-            <li><a href="{{ $createAnchor }}">Create post</a></li>
+
+            {{-- Основные кнопки --}}
+            <li><a href="{{ $postsAnchor }}" @class([
+                'is-active' => request()->routeIs('posts.index', 'posts.show'),
+            ])>Posts</a></li>
             <li><a href="{{ $aboutAnchor }}">About</a></li>
             <li><a href="{{ $footerAnchor }}">Contacts</a></li>
+
             @auth
-                <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ route('profile.edit') }}" class="btn-profile" aria-label="Profile">Profile</a></li>
-                @if (auth()->user()->isAdmin())
-                    <li><a href="{{ route('admin.panel') }}">Admin panel</a></li>
-                @endif
-                <li>
-                    <form method="POST" action="{{ route('logout') }}" data-confirm data-confirm-title="Log out?"
-                        data-confirm-message="Are you sure you want to log out?" data-confirm-button="Log out">
-                        @csrf
-                        <button type="submit" class="btn-logout">Log out</button>
-                    </form>
+                @php $authUser = auth()->user(); @endphp
+                {{-- Всё для пользователя: горизонтальная панель, встроенная под меню --}}
+                <li class="user-menu" id="user-menu">
+                    <button type="button" class="user-trigger" id="user-trigger" aria-haspopup="true" aria-expanded="false"
+                        aria-controls="user-bar">
+                        @if ($authUser->avatar)
+                            <img class="user-avatar" src="{{ $authUser->avatar }}" alt="">
+                        @else
+                            <span
+                                class="user-avatar user-avatar--letter">{{ mb_strtoupper(mb_substr($authUser->name, 0, 1)) }}</span>
+                        @endif
+                        <span class="user-name">{{ $authUser->name }}</span>
+                        <svg class="user-chevron" width="12" height="12" viewBox="0 0 20 20" fill="currentColor"
+                            aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+                    <div class="user-bar" id="user-bar">
+                        <span class="user-bar-label">{{ $authUser->name }}</span>
+                        <a href="{{ route('posts.create') }}" class="menu-cta">Create post</a>
+                        <a href="{{ route('dashboard') }}">Dashboard</a>
+                        <a href="{{ route('profile.edit') }}">Profile</a>
+                        @if ($authUser->isAdmin())
+                            <a href="{{ route('admin.panel') }}">Admin panel</a>
+                        @endif
+                        <form method="POST" action="{{ route('logout') }}" data-confirm data-confirm-title="Log out?"
+                            data-confirm-message="Are you sure you want to log out?" data-confirm-button="Log out">
+                            @csrf
+                            <button type="submit" class="btn-logout">Log out</button>
+                        </form>
+                    </div>
                 </li>
             @endauth
+
             @guest
                 <li><a href="{{ route('login') }}">Log in</a></li>
-                <li><a href="{{ route('register') }}">Register</a></li>
+                <li><a href="{{ route('register') }}" class="menu-cta">Register</a></li>
             @endguest
-
         </ul>
     </nav>
 
@@ -683,7 +931,6 @@
     <div class="confirm-overlay" data-confirm-overlay aria-hidden="true">
         <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title"
             aria-describedby="confirm-copy">
-            <span class="confirm-kicker">Confirmation</span>
             <h2 class="confirm-title" id="confirm-title">Delete item?</h2>
             <p class="confirm-copy" id="confirm-copy">This action cannot be undone.</p>
             <div class="confirm-actions">
@@ -791,10 +1038,16 @@
                 }
 
                 window.requestAnimationFrame(() => {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                    });
+                    if (window.lenis) {
+                        window.lenis.scrollTo(target, {
+                            offset: -108
+                        });
+                    } else {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
 
                     if (pushState) {
                         window.history.pushState(null, '', hash);
@@ -841,7 +1094,7 @@
             position: fixed;
             inset: 0;
             z-index: 1500;
-            background: rgba(8, 8, 8, 0.7);
+            background: var(--overlay-bg);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: flex-start;
@@ -859,9 +1112,8 @@
 
         .search-box {
             width: min(580px, calc(100vw - 32px));
-            background: rgba(24, 24, 24, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
+            background: var(--surface-2);
+            box-shadow: var(--shadow-soft);
             overflow: hidden;
             transform: translateY(-10px);
             transition: transform 0.2s ease;
@@ -875,58 +1127,71 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: 60px;
+            padding: 8px 20px;
+            background: var(--surface-3);
+            transition: background-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* фокус поля поиска: подсветка фона и свечение, без рамки */
+        .search-input-wrap:focus-within {
+            background: var(--surface-hover);
+            box-shadow: inset 0 0 28px rgba(var(--accent-rgb), 0.22);
         }
 
         .search-icon-modal {
             font-size: 18px;
-            opacity: 0.5;
+            opacity: 0.8;
             flex-shrink: 0;
             width: 20px;
             height: 20px;
-
+            filter: var(--icon-filter);
         }
 
         .search-input {
             flex: 1;
+            min-height: var(--btn-h);
             background: transparent;
             border: none;
             outline: none;
             font-size: 17px;
             font-family: inherit;
             color: var(--text-main);
+            caret-color: var(--accent);
         }
 
         .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--text-muted);
         }
 
         .search-hint {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            color: var(--text-muted);
             flex-shrink: 0;
         }
 
         .search-results {
             max-height: 360px;
             overflow-y: auto;
+            padding: 0 8px;
         }
 
         .search-result-item {
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 14px 20px;
+            min-height: 60px;
+            padding: 8px 12px;
+            margin-bottom: 2px;
             text-decoration: none;
             color: var(--text-main);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background 0.15s ease;
+            transition: background-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .search-result-item:hover,
         .search-result-item.is-active {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--surface-hover);
+            box-shadow: inset 0 0 18px rgba(var(--accent-rgb), 0.15);
         }
 
         .search-result-img {
@@ -934,7 +1199,7 @@
             height: 48px;
             object-fit: cover;
             flex-shrink: 0;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--surface-soft);
         }
 
         .search-result-info {
@@ -944,67 +1209,84 @@
         }
 
         .search-result-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-shadow: var(--glow);
+            transition: text-shadow 0.2s ease;
+        }
+
+        .search-result-item:hover .search-result-title,
+        .search-result-item.is-active .search-result-title {
+            text-shadow: var(--glow-hover);
         }
 
         .search-result-title mark {
             background: transparent;
-            color: #f2ede2;
+            color: var(--accent);
             text-decoration: underline;
             text-underline-offset: 2px;
         }
 
         .search-result-excerpt {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            color: var(--text-muted);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
+        .search-section-title {
+            padding: 14px 12px 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: var(--glow-faint);
+        }
+
+        .search-result-img.is-avatar {}
+
         .search-empty {
             padding: 28px 20px;
             text-align: center;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.38);
+            font-size: 15px;
+            color: var(--text-muted);
         }
 
         .search-footer {
-            padding: 10px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 8px;
+            padding: 12px 20px;
+            background: var(--surface-3);
             display: flex;
-            gap: 16px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.3);
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
         .search-footer kbd {
             display: inline-block;
-            padding: 1px 5px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            background: var(--surface-hover);
             font-family: inherit;
-            font-size: 11px;
-            border-radius: 2px;
+            font-size: 14px;
         }
 
         .search-icon-menu {
             width: 24.7px;
             height: 24.7px;
-            opacity: 0.5;
-            filter: brightness(0) invert(1);
-
+            opacity: 0.85;
+            filter: var(--icon-filter);
         }
 
         .theme-icon-menu {
             width: 24.7px;
             height: 24.7px;
-            opacity: 0.5;
+            opacity: 0.85;
             display: block;
-            filter: brightness(0) invert(1);
+            filter: var(--icon-filter);
         }
 
         .search-spinner {
@@ -1017,12 +1299,15 @@
             display: flex;
         }
 
+        /* квадратное кольцо без border: конический градиент с маской */
         .spinner {
             width: 28px;
             height: 28px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #f4f4f4;
-            border-radius: 50%;
+            padding: 3px;
+            background: conic-gradient(var(--accent) 0 28%, var(--surface-hover) 0);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
             animation: spin 0.7s linear infinite;
         }
 
@@ -1038,44 +1323,60 @@
             right: 40px;
             width: 52px;
             height: 52px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(24, 24, 24, 0.88);
-            color: #f4f4f4;
+            padding: 0;
+            background: var(--surface-3);
+            color: var(--text-main);
             font-size: 26px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-shadow: var(--glow);
+            box-shadow: var(--shadow-raise);
             opacity: 0;
             pointer-events: none;
             transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease, box-shadow 0.2s ease;
             z-index: 1100;
         }
 
         .btn-up.is-visible {
-            opacity: 0.8;
+            opacity: 1;
             pointer-events: auto;
             transform: translateY(0);
         }
 
         .btn-up:hover {
-            opacity: 1;
-            background: rgba(40, 40, 40, 0.95);
+            text-shadow: var(--glow-hover);
+        }
+
+        /* Без мерцаний; при reduced-motion убираем анимации и плавные переходы */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .spinner {
+                animation-duration: 1.6s !important;
+                animation-iteration-count: infinite !important;
+            }
+
         }
     </style>
 
     <div class="search-overlay" id="search-overlay" aria-hidden="true">
-        <div class="search-box" role="dialog" aria-label="Search posts">
+        <div class="search-box" role="dialog" aria-label="Search posts and people">
             <div class="search-input-wrap">
                 <span class="search-icon">
                     <img src="{{ asset('images/search.svg') }}" class="search-icon-modal" alt="Search Modal">
                 </span>
-                <input type="text" class="search-input" id="search-input" placeholder="Search posts..."
-                    autocomplete="off" aria-label="Search">
+                <input type="text" class="search-input" id="search-input"
+                    placeholder="Search posts and people..." autocomplete="off" aria-label="Search">
                 <span class="search-hint">ESC to close</span>
             </div>
-            <div class="search-results" id="search-results">
+            <div class="search-results" id="search-results" data-lenis-prevent>
                 <div class="search-spinner" id="search-spinner">
                     <div class="spinner"></div>
                 </div>
@@ -1097,6 +1398,46 @@
 
             let debounceTimer = null;
             let activeIndex = -1;
+            let requestId = 0;
+
+            const defaultAvatar = '{{ asset('images/default-avatar.svg') }}';
+            const userSearchUrl =
+                '{{ \Illuminate\Support\Facades\Route::has('users.search') ? route('users.search') : url('/users/search') }}';
+
+            const escapeHtml = (value) => String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const highlightSafe = (text, query) => {
+                const raw = String(text ?? '');
+                if (!query) return escapeHtml(raw);
+                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return raw
+                    .split(new RegExp(`(${escapedQuery})`, 'gi'))
+                    .map((part, i) => i % 2 ? `<mark>${escapeHtml(part)}</mark>` : escapeHtml(part))
+                    .join('');
+            };
+
+            const normalizeAvatar = (src) => {
+                if (!src) return defaultAvatar;
+                const nested = String(src).match(/\/storage\/(https?:\/\/.+)$/);
+                return nested ? nested[1] : src;
+            };
+
+            const fetchJson = async (url) => {
+                const res = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                });
+                if (!res.ok) throw new Error('Request failed: ' + res.status);
+                return res.json();
+            };
 
 
             const openSearch = () => {
@@ -1136,24 +1477,45 @@
             };
 
 
-            const renderResults = (posts, query) => {
+            const renderResults = ({
+                posts,
+                users
+            }, query) => {
                 activeIndex = -1;
 
-                if (!posts.length) {
+                if (!posts.length && !users.length) {
                     results.innerHTML =
-                        `<p class="search-empty">No posts found for "<strong>${query}</strong>"</p>`;
+                        `<p class="search-empty">Nothing found for "<strong>${escapeHtml(query)}</strong>"</p>`;
                     return;
                 }
 
-                results.innerHTML = posts.map((post, i) => `
-                <a href="${post.url}" class="search-result-item" data-index="${i}">
-                    <img src="${post.image}" alt="" class="search-result-img">
-                    <div class="search-result-info">
-                        <div class="search-result-title">${highlight(post.title, query)}</div>
-                        <div class="search-result-excerpt">${post.excerpt}</div>
-                    </div>
-                </a>
-            `).join('');
+                const postsHtml = posts.length ? `
+                <div class="search-section-title">Posts</div>
+                ${posts.map((post) => `
+                                    <a href="${post.url}" class="search-result-item">
+                                        <img src="${post.image}" alt="" class="search-result-img">
+                                        <div class="search-result-info">
+                                            <div class="search-result-title">${highlight(post.title, query)}</div>
+                                            <div class="search-result-excerpt">${post.excerpt}</div>
+                                        </div>
+                                    </a>
+                                    `).join('')}` : '';
+
+                const usersHtml = users.length ? `
+                <div class="search-section-title">People</div>
+                ${users.map((user) => `
+                                    <a href="${escapeHtml(user.url)}" class="search-result-item">
+                                        <img src="${escapeHtml(normalizeAvatar(user.avatar))}" alt=""
+                                            class="search-result-img is-avatar"
+                                            onerror="this.onerror=null;this.src='${defaultAvatar}'">
+                                        <div class="search-result-info">
+                                            <div class="search-result-title">${highlightSafe(user.name, query)}</div>
+                                            <div class="search-result-excerpt">View profile</div>
+                                        </div>
+                                    </a>
+                                    `).join('')}` : '';
+
+                results.innerHTML = postsHtml + usersHtml;
             };
 
 
@@ -1173,17 +1535,29 @@
                     resultsContainer.innerHTML = '';
                     spinner?.classList.add('is-loading');
 
-                    try {
-                        const res = await fetch(`/posts/search?q=${encodeURIComponent(query)}`, {
+                    const currentRequest = ++requestId;
 
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            credentials: 'same-origin',
-                        });
-                        const data = await res.json();
-                        renderResults(data, query);
+                    try {
+                        const [postsResult, usersResult] = await Promise.allSettled([
+                            fetchJson(`/posts/search?q=${encodeURIComponent(query)}`),
+                            fetchJson(`${userSearchUrl}?q=${encodeURIComponent(query)}`),
+                        ]);
+
+                        if (currentRequest !== requestId) return;
+
+                        if (postsResult.status === 'rejected' && usersResult.status ===
+                            'rejected') {
+                            throw new Error('Search failed');
+                        }
+
+                        const toList = (result) =>
+                            result.status === 'fulfilled' && Array.isArray(result.value) ? result
+                            .value : [];
+
+                        renderResults({
+                            posts: toList(postsResult),
+                            users: toList(usersResult)
+                        }, query);
                     } catch (err) {
                         console.error('Search error:', err);
                         results.innerHTML = `<p class="search-empty">Search failed. Try again.</p>`;
@@ -1252,10 +1626,14 @@
                     btnUp.classList.toggle('is-visible', window.scrollY > 300);
                 });
                 btnUp.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
+                    if (window.lenis) {
+                        window.lenis.scrollTo(0);
+                    } else {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
                 });
             }
         })();
@@ -1282,6 +1660,71 @@
         menuLinks?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
     </script>
 
+
+
+    <script>
+        (() => {
+            const menu = document.getElementById('user-menu');
+            const trigger = document.getElementById('user-trigger');
+            if (!menu || !trigger) return;
+
+            const setOpen = (open) => {
+                menu.classList.toggle('is-open', open);
+                trigger.setAttribute('aria-expanded', String(open));
+            };
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setOpen(!menu.classList.contains('is-open'));
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target)) setOpen(false);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') setOpen(false);
+            });
+
+            document.getElementById('open-search')?.addEventListener('click', () => setOpen(false));
+        })();
+    </script>
+
+
+    <script>
+        (() => {
+            if (typeof Lenis === 'undefined') {
+                console.warn('Lenis не загрузился (проверьте CDN-скрипт в <head>)');
+                return;
+            }
+
+            const lenis = new Lenis({
+                duration: 2.0, // больше = медленнее и «кинематографичнее»
+                wheelMultiplier: 0.8, // меньше = короче шаг на одно колесо мыши
+                smoothWheel: true,
+            });
+            window.lenis = lenis;
+
+            const raf = (time) => {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            };
+            requestAnimationFrame(raf);
+
+            // Останавливаем плавный скролл страницы, пока открыты поиск, подтверждение или мобильное меню
+            const syncLock = () => {
+                const locked = document.querySelector(
+                    '.search-overlay.is-open, .confirm-overlay.is-open, .menu-links.is-open'
+                );
+                locked ? lenis.stop() : lenis.start();
+            };
+            new MutationObserver(syncLock).observe(document.body, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class'],
+            });
+        })();
+    </script>
 
 </body>
 

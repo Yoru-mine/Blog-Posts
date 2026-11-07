@@ -4,7 +4,14 @@
 
 @section('content')
     @php
-        $avatarUrl = $user->avatar ? $user->avatar : asset('public/images/default-avatar.svg');
+        $avatarUrl = $user->avatar ? $user->avatar : asset('images/default-avatar.svg');
+
+        $followingRelation = $user->following();
+        $followingCount = $followingRelation->count();
+
+        $followersCount = \Illuminate\Support\Facades\DB::table($followingRelation->getTable())
+            ->where($followingRelation->getRelatedPivotKeyName(), $user->id)
+            ->count();
     @endphp
 
     <style>
@@ -51,7 +58,6 @@
             gap: 24px;
             padding: 36px 38px;
             background: rgba(28, 28, 28, 0.78);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow-soft);
             backdrop-filter: blur(12px);
         }
@@ -71,7 +77,6 @@
             background-position: center;
             background-repeat: no-repeat;
             justify-self: center;
-            border: 1px solid rgba(255, 255, 255, 0.14);
             box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
         }
 
@@ -82,7 +87,7 @@
         .public-profile-kicker {
             display: inline-block;
             margin-bottom: 18px;
-            font-size: 12px;
+            font-size: 14px;
             letter-spacing: 0.14em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.58);
@@ -102,11 +107,41 @@
             color: rgba(255, 255, 255, 0.78);
         }
 
+        .public-profile-follow-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .public-profile-follow-stat {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+            min-width: 150px;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .public-profile-follow-stat-value {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .public-profile-follow-stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.56);
+        }
+
+        .public-profile-actions form {
+            display: contents;
+        }
+
         .public-profile-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 28px;
+            gap: 10px;
+            margin-top: 24px;
         }
 
         .public-profile-action,
@@ -114,29 +149,71 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 52px;
-            padding: 0 22px;
+            min-height: var(--btn-h);
+            padding: 0 20px;
             text-decoration: none;
             font-size: 15px;
             font-weight: 600;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .public-profile-action {
-            background: #f2ede2;
-            color: #1E1E1E;
-        }
-
-        .public-profile-action-secondary {
+            color: var(--text-main);
             background: rgba(255, 255, 255, 0.08);
-            color: #f4f4f4;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .public-profile-action:hover,
         .public-profile-action-secondary:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .public-profile-follow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: var(--btn-h);
+            padding: 0 22px;
+            border: 0;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--accent-contrast);
+            background: var(--accent);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .public-profile-follow:hover,
+        .public-profile-follow:focus-visible {
+            background: var(--accent-hover);
+        }
+
+        .public-profile-follow[aria-pressed="true"],
+        .public-profile-follow.is-following {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+            font-weight: 600;
+        }
+
+        .public-profile-follow[aria-pressed="true"]:hover,
+        .public-profile-follow.is-following:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .public-profile-follow.is-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .public-profile-follow .follow-check {
+            display: none;
+        }
+
+        .public-profile-follow.is-following .follow-check {
+            display: block;
+        }
+
+        .public-profile-actions form {
+            margin: 0;
         }
 
         .public-profile-stats {
@@ -149,13 +226,12 @@
             min-height: 132px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             overflow: hidden;
         }
 
         .public-profile-stat-label {
             margin-bottom: 16px;
-            font-size: 13px;
+            font-size: 14px;
             color: rgba(255, 255, 255, 0.56);
         }
 
@@ -176,7 +252,6 @@
         .public-profile-posts {
             padding: 30px;
             background: rgba(30, 30, 30, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow-soft);
         }
 
@@ -199,24 +274,44 @@
         }
 
         .public-profile-post-card {
-            display: block;
-            min-height: 220px;
-            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             text-decoration: none;
             color: inherit;
             background:
                 linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
                 rgba(20, 20, 20, 0.76);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+            transition: background-color 0.22s ease;
         }
 
-        .public-profile-post-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.16);
+        .public-profile-post-card:hover,
+        .public-profile-post-card:focus-visible {
             background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04)),
                 rgba(22, 22, 22, 0.82);
+        }
+
+        .public-profile-post-card:hover .public-profile-post-title {
+            text-shadow: var(--glow-hover);
+        }
+
+        .public-profile-post-media {
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .public-profile-post-media img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .public-profile-post-body {
+            flex: 1;
+            padding: 18px;
         }
 
         .public-profile-post-title {
@@ -227,21 +322,28 @@
 
         .public-profile-post-copy {
             margin: 0 0 16px;
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.7;
             color: rgba(255, 255, 255, 0.76);
         }
 
         .public-profile-post-date {
-            font-size: 13px;
+            font-size: 14px;
             color: rgba(255, 255, 255, 0.48);
         }
 
         .public-profile-empty {
             padding: 22px 24px;
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             color: rgba(255, 255, 255, 0.78);
+        }
+
+        .public-profile-title,
+        .public-profile-section-title,
+        .public-profile-stat-value,
+        .public-profile-follow-stat-value,
+        .public-profile-post-title {
+            text-shadow: var(--glow);
         }
 
         @media (max-width: 1100px) {
@@ -291,7 +393,9 @@
             }
 
             .public-profile-action,
-            .public-profile-action-secondary {
+            .public-profile-action-secondary,
+            .public-profile-follow,
+            .public-profile-actions form {
                 width: 100%;
             }
         }
@@ -308,13 +412,49 @@
                     <div class="public-profile-copy">
                         <span class="public-profile-kicker">Public profile</span>
                         <h1 class="public-profile-title">{{ $user->name }}</h1>
+                        @if ($user->username)
+                            <p style="margin: -6px 0 16px; opacity: .6;">{{ '@' . $user->username }}</p>
+                        @endif
                         <p class="public-profile-copy-text">
                             A personal page inside the project atmosphere. Here you can see the author's public profile,
                             recent posts, and the general mood of their account.
                         </p>
 
+                        <div class="public-profile-follow-stats">
+                            <div class="public-profile-follow-stat">
+                                <span class="public-profile-follow-stat-value">{{ $followersCount }}</span>
+                                <span class="public-profile-follow-stat-label">Followers</span>
+                            </div>
+                            <div class="public-profile-follow-stat">
+                                <span class="public-profile-follow-stat-value">{{ $followingCount }}</span>
+                                <span class="public-profile-follow-stat-label">Following</span>
+                            </div>
+                        </div>
+
                         <div class="public-profile-actions">
-                            <a href="{{ route('posts.index') }}" class="public-profile-action">Browse posts</a>
+                            @if (!$viewer || $viewer->id !== $user->id)
+
+                                @if ($isFollowing)
+                                    <form action="{{ route('profile.show', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="public-profile-follow" aria-pressed="true">
+                                            Unfollow
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('users.follow', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="public-profile-follow" aria-pressed="false">
+                                            Follow
+                                        </button>
+                                    </form>
+                                @endif
+
+                            @endif
+
+                            <a href="{{ route('posts.index') }}" class="public-profile-action-secondary">Browse posts</a>
+
                             @if ($viewer && $viewer->id === $user->id)
                                 <a href="{{ route('profile.edit') }}" class="public-profile-action-secondary">Open your
                                     profile</a>
@@ -372,10 +512,17 @@
                     <div class="public-profile-post-grid">
                         @foreach ($recentPosts as $post)
                             <a href="{{ route('posts.show', $post->id) }}" class="public-profile-post-card">
-                                <h3 class="public-profile-post-title">{{ $post->title }}</h3>
-                                <p class="public-profile-post-copy">
-                                    {{ \Illuminate\Support\Str::limit($post->content, 110) }}</p>
-                                <div class="public-profile-post-date">{{ $post->created_at->format('d M Y') }}</div>
+                                <div class="public-profile-post-media">
+                                    <img src="{{ $post->image ?: asset('images/default.png') }}" alt="{{ $post->title }}"
+                                        loading="lazy">
+                                </div>
+
+                                <div class="public-profile-post-body">
+                                    <h3 class="public-profile-post-title">{{ $post->title }}</h3>
+                                    <p class="public-profile-post-copy">
+                                        {{ \Illuminate\Support\Str::limit($post->content, 110) }}</p>
+                                    <div class="public-profile-post-date">{{ $post->created_at->format('d M Y') }}</div>
+                                </div>
                             </a>
                         @endforeach
                     </div>
@@ -383,4 +530,20 @@
             </section>
         </div>
     </div>
+
+    <script>
+        (() => {
+            const button = document.querySelector('[data-follow-button]');
+            const label = button?.querySelector('[data-follow-label]');
+            if (!button || !label) return;
+
+            button.addEventListener('click', () => {
+                const following = !button.classList.contains('is-following');
+                button.classList.toggle('is-following', following);
+                button.setAttribute('aria-pressed', String(following));
+                label.textContent = following ? 'Following' : 'Follow';
+
+            });
+        })();
+    </script>
 @endsection

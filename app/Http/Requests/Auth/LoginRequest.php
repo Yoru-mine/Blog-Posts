@@ -21,6 +21,27 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Форма может прислать идентификатор в поле email, login или username.
+     * Берём первое непустое значение и складываем его в email: так ошибки
+     * по-прежнему показываются под тем полем, которое уже есть в форме.
+     */
+    protected function prepareForValidation(): void
+    {
+        $identifier = '';
+
+        foreach (['email', 'login', 'username'] as $key) {
+            $value = trim((string) $this->input($key, ''));
+
+            if ($value !== '') {
+                $identifier = $value;
+                break;
+            }
+        }
+
+        $this->merge(['email' => $identifier]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -28,7 +49,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            // Здесь email или username, поэтому формат email не проверяем
+            'email' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,7 +64,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $login = trim((string) $this->input('email'));
+
+        // Есть «@» и это валидный адрес: ищем по email, иначе по username
+        $isEmail = filter_var($login, FILTER_VALIDATE_EMAIL) !== false;
+
+        $credentials = [
+            $isEmail ? 'email' : 'username' => $isEmail ? Str::lower($login) : $login,
+            'password' => $this->input('password'),
+        ];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -81,6 +113,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower((string) $this->input('email')) . '|' . $this->ip());
     }
 }

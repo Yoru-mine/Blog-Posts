@@ -3,28 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Comment;
+use App\Models\User;
+use App\Services\ImgbbService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function show(Request $request, \App\Models\User $user): View
+    public function show(Request $request, User $user): View
     {
-        $recentPosts = $user->posts()->latest()->take(6)->get();
+        $viewer = $request->user();
+
+
+        $visiblePosts = fn() => $user->posts()->published()->visibleTo($viewer);
+
+        $isFollowing = $viewer
+            ? $viewer->following()->where('users.id', $user->id)->exists()
+            : false;
 
         return view('profile.show', [
-            'viewer' => $request->user(),
+            'viewer' => $viewer,
             'user' => $user,
-            'postsCount' => $user->posts()->count(),
-            'latestPost' => $user->posts()->latest()->first(),
-            'recentPosts' => $recentPosts,
-            'commentsReceived' => $user->posts()->withCount('comments')->get()->sum('comments_count'),
+            'postsCount' => $visiblePosts()->count(),
+            'latestPost' => $visiblePosts()->latest()->first(),
+            'recentPosts' => $visiblePosts()->latest()->take(6)->get(),
+            'commentsReceived' => Comment::whereIn('post_id', $visiblePosts()->select('id'))->count(),
+            'isFollowing' => $isFollowing,
         ]);
     }
-
 
     public function edit(Request $request): View
     {
@@ -37,36 +48,60 @@ class ProfileController extends Controller
         ]);
     }
 
-
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, ImgbbService $imgbb): RedirectResponse
     {
         $user = $request->user();
         $user->fill($request->safe()->except('avatar'));
 
-        if ($request->hasFile('avatar')) {
-            $response = \Illuminate\Support\Facades\Http::asMultipart()->post('https://api.imgbb.com/1/upload', [
-                'key' => env('IMGBB_API_KEY'),
-                'image' => base64_encode(file_get_contents($request->file('avatar')->getRealPath())),
-            ]);
+        $oldAvatar = null;
 
-            if ($response->successful()) {
-                $user->avatar = $response->json()['data']['url'];
-            } else {
+        if ($request->hasFile('avatar')) {
+            try {
+                $newAvatar = $imgbb->upload($request->file('avatar'));
+            } catch (\Throwable $e) {
+                report($e);
+
                 return Redirect::route('profile.edit')
                     ->withErrors(['avatar' => 'Failed to upload avatar. Please try again.']);
             }
+
+            $oldAvatar = $user->avatar;
+            $user->avatar = $newAvatar;
         }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
-        \Illuminate\Support\Facades\Cache::flush();
+        $profileChanged = $user->isDirty(['name', 'avatar']);
+
         $user->save();
+
+        $this->deleteRemoteImage($imgbb, $oldAvatar);
+
+        if ($profileChanged) {
+            $this->forgetUserPostsCache($user);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    public function destroyAvatar(Request $request, ImgbbService $imgbb): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            $oldAvatar = $user->avatar;
+
+            $user->avatar = null;
+            $user->save();
+
+            $this->deleteRemoteImage($imgbb, $oldAvatar);
+            $this->forgetUserPostsCache($user);
+        }
+
+        return back()->with('status', 'avatar-deleted');
+    }
 
     public function destroy(Request $request): RedirectResponse
     {
@@ -75,14 +110,40 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        $postIds = $user->posts()->pluck('id');
 
         Auth::logout();
 
         $user->delete();
 
+        $postIds->each(function ($postId) {
+            Cache::forget("posts:show:{$postId}");
+            Cache::forget("posts:similar:v2:{$postId}");
+        });
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    private function forgetUserPostsCache(User $user): void
+    {
+        $user->posts()->pluck('id')->each(function ($postId) {
+            Cache::forget("posts:show:{$postId}");
+        });
+    }
+
+    private function deleteRemoteImage(ImgbbService $imgbb, ?string $url): void
+    {
+        if (! $url) {
+            return;
+        }
+
+        try {
+            $imgbb->delete($url);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 }

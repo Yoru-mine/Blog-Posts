@@ -51,7 +51,6 @@
             gap: 24px;
             padding: 36px 38px;
             background: rgba(28, 28, 28, 0.78);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow-soft);
             backdrop-filter: blur(12px);
         }
@@ -70,7 +69,7 @@
         .profile-kicker {
             display: inline-block;
             margin-bottom: 18px;
-            font-size: 12px;
+            font-size: 14px;
             letter-spacing: 0.14em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.58);
@@ -104,7 +103,6 @@
             background-position: center;
             background-repeat: no-repeat;
             box-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
-            border: 1px solid rgba(255, 255, 255, 0.14);
             flex-shrink: 0;
         }
 
@@ -120,29 +118,24 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 52px;
+            min-height: var(--btn-h);
             padding: 0 22px;
             text-decoration: none;
             font-size: 15px;
             font-weight: 600;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .profile-action {
-            background: #f2ede2;
-            color: #1E1E1E;
-        }
-
+        /* навигационные кнопки героя вторичные: главное действие экрана — «Save changes» */
+        .profile-action,
         .profile-action-secondary {
             background: rgba(255, 255, 255, 0.08);
-            color: #f4f4f4;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
         }
 
         .profile-action:hover,
         .profile-action-secondary:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
+            background: rgba(255, 255, 255, 0.14);
         }
 
         .profile-stats {
@@ -155,13 +148,12 @@
             min-height: 132px;
             padding: 20px;
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             overflow: hidden;
         }
 
         .profile-stat-label {
             margin-bottom: 16px;
-            font-size: 13px;
+            font-size: 14px;
             color: rgba(255, 255, 255, 0.56);
         }
 
@@ -188,14 +180,12 @@
         .profile-card {
             padding: 30px;
             background: rgba(30, 30, 30, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow-soft);
         }
 
         .profile-card-danger {
             grid-column: 1 / -1;
             background: linear-gradient(180deg, rgba(72, 28, 28, 0.28), rgba(30, 30, 30, 0.82));
-            border: 1px solid rgba(255, 160, 160, 0.14);
         }
 
         .profile-card-title {
@@ -221,7 +211,7 @@
         }
 
         .profile-label {
-            font-size: 13px;
+            font-size: 14px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.56);
@@ -231,18 +221,26 @@
             width: 100%;
             min-height: 58px;
             padding: 0 18px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(20, 20, 20, 0.62);
+            background: rgba(0, 0, 0, 0.38);
             color: #f5f5f5;
             font-size: 16px;
             font-family: inherit;
             outline: none;
-            transition: border-color 0.2s ease, background 0.2s ease;
+            transition: box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .profile-input:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .profile-input:focus {
-            border-color: rgba(255, 255, 255, 0.32);
-            background: rgba(24, 24, 24, 0.9);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.28), 0 0 24px rgba(var(--accent-rgb), 0.2);
+        }
+
+        .profile-input[aria-invalid="true"] {
+            background: rgba(var(--danger-rgb), 0.1);
+            box-shadow: 0 0 0 3px rgba(var(--danger-rgb), 0.3);
         }
 
         .profile-file-field {
@@ -255,18 +253,62 @@
             width: 100%;
             min-height: 58px;
             padding: 14px 18px;
-            border: 1px dashed rgba(255, 255, 255, 0.18);
-            background: rgba(20, 20, 20, 0.48);
+            background: rgba(0, 0, 0, 0.38);
             color: rgba(255, 255, 255, 0.72);
             font-family: inherit;
             font-size: 15px;
             cursor: pointer;
         }
 
+        .profile-file-input::file-selector-button {
+            margin-right: 14px;
+            min-height: 36px;
+            padding: 0 16px;
+            border: 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .profile-file-input:hover::file-selector-button {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .profile-file-input:focus-visible {
+            outline: none;
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.28), 0 0 24px rgba(var(--accent-rgb), 0.2);
+        }
+
         .profile-file-note {
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.6;
             color: rgba(255, 255, 255, 0.56);
+        }
+
+        .profile-avatar-remove {
+            justify-self: start;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--btn-h);
+            padding: 0 18px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--danger);
+            background: rgba(var(--danger-rgb), 0.14);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .profile-avatar-remove:hover,
+        .profile-avatar-remove:focus-visible {
+            background: rgba(var(--danger-rgb), 0.26);
         }
 
         .profile-button,
@@ -274,41 +316,61 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 50px;
-            padding: 0 20px;
+            min-height: var(--btn-h);
+            padding: 0 22px;
             border: none;
             font-family: inherit;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
         }
 
+        /* главное действие экрана */
         .profile-button {
-            background: #f2ede2;
-            color: #1E1E1E;
+            background: var(--accent);
+            color: var(--accent-contrast);
+            font-weight: 700;
         }
 
+        .profile-button:hover {
+            background: var(--accent-hover);
+        }
+
+        .profile-button-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .profile-button-secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        /* опасное действие: красный тон, отдельная карточка, диалог подтверждения */
         .profile-button-danger {
-            background: #f0d6d6;
-            color: #441d1d;
+            background: rgba(var(--danger-rgb), 0.14);
+            color: var(--danger);
         }
 
-        .profile-button:hover,
         .profile-button-danger:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
+            background: rgba(var(--danger-rgb), 0.26);
+        }
+
+        .profile-button[aria-busy="true"] {
+            opacity: 0.65;
+            pointer-events: none;
         }
 
         .profile-status {
-            font-size: 14px;
-            color: #d8e6d0;
+            font-size: 15px;
+            color: var(--success);
         }
 
         .profile-error {
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.5;
-            color: #efb3b3;
+            color: var(--danger);
         }
 
         .verification-note {
@@ -322,12 +384,13 @@
             display: inline;
             border: none;
             background: none;
-            color: #f2ede2;
+            color: var(--accent);
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             text-decoration: underline;
+            text-underline-offset: 4px;
             cursor: pointer;
-            padding: 0;
+            padding: 12px 0;
         }
 
         .profile-actions-row {
@@ -335,6 +398,12 @@
             align-items: center;
             gap: 14px;
             flex-wrap: wrap;
+        }
+
+        .profile-title,
+        .profile-card-title,
+        .profile-stat-value {
+            text-shadow: var(--glow);
         }
 
         @media (max-width: 1100px) {
@@ -401,6 +470,9 @@
                     <div class="profile-hero-copy">
                         <span class="profile-kicker">Account space</span>
                         <h1 class="profile-title">{{ $user->name }}</h1>
+                        @if ($user->username)
+                            <p style="margin: -6px 0 16px; opacity: .6;">{{ '@' . $user->username }}</p>
+                        @endif
                         <p class="profile-copy">
                             This is your profile page. Here you can update your basic information, change your password, and
                             manage your account without leaving the same atmosphere as the rest of the project.
@@ -456,6 +528,16 @@
                         @csrf
                     </form>
 
+                    @if ($user->avatar && \Illuminate\Support\Facades\Route::has('profile.avatar.destroyAvatar'))
+                        <form id="remove-avatar-form" method="post" action="{{ route('profile.avatar.destroyAvatar') }}"
+                            data-confirm data-confirm-title="Remove avatar?"
+                            data-confirm-message="Your avatar will be replaced with the default image."
+                            data-confirm-button="Remove avatar">
+                            @csrf
+                            @method('delete')
+                        </form>
+                    @endif
+
                     <form method="post" action="{{ route('profile.update') }}" class="profile-form"
                         enctype="multipart/form-data">
                         @csrf
@@ -468,23 +550,44 @@
                                 Choose an image here to update both your profile avatar and the blurred background of this
                                 page.
                             </div>
+
+                            @if ($user->avatar && \Illuminate\Support\Facades\Route::has('profile.avatar.destroyAvatar'))
+                                <button type="submit" form="remove-avatar-form" class="profile-avatar-remove">Remove
+                                    avatar</button>
+                            @endif
                         </div>
 
                         <div class="profile-field">
                             <label for="name" class="profile-label">Name</label>
                             <input id="name" name="name" type="text" class="profile-input"
-                                value="{{ old('name', $user->name) }}" required autofocus autocomplete="name">
+                                value="{{ old('name', $user->name) }}" required autofocus autocomplete="name"
+                                @if ($errors->get('name')) aria-invalid="true" aria-describedby="name-error" @endif>
                             @if ($errors->get('name'))
-                                <div class="profile-error">{{ $errors->first('name') }}</div>
+                                <div class="profile-error" id="name-error" role="alert">{{ $errors->first('name') }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="username" class="profile-label">Username</label>
+                            <input id="username" name="username" type="text" class="profile-input"
+                                value="{{ old('username', $user->username) }}" required minlength="3" maxlength="30"
+                                pattern="[A-Za-z0-9_]{3,30}" autocomplete="nickname" autocapitalize="none"
+                                @if ($errors->get('username')) aria-invalid="true" aria-describedby="username-error" @endif>
+                            @if ($errors->get('username'))
+                                <div class="profile-error" id="username-error" role="alert">
+                                    {{ $errors->first('username') }}</div>
                             @endif
                         </div>
 
                         <div class="profile-field">
                             <label for="email" class="profile-label">Email</label>
                             <input id="email" name="email" type="email" class="profile-input"
-                                value="{{ old('email', $user->email) }}" required autocomplete="username">
+                                value="{{ old('email', $user->email) }}" required autocomplete="username"
+                                @if ($errors->get('email')) aria-invalid="true" aria-describedby="email-error" @endif>
                             @if ($errors->get('email'))
-                                <div class="profile-error">{{ $errors->first('email') }}</div>
+                                <div class="profile-error" id="email-error" role="alert">{{ $errors->first('email') }}
+                                </div>
                             @endif
 
                             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
@@ -496,7 +599,8 @@
                             @endif
 
                             @if (session('status') === 'verification-link-sent')
-                                <div class="profile-status">A new verification link has been sent to your email address.
+                                <div class="profile-status" role="status">A new verification link has been sent to your
+                                    email address.
                                 </div>
                             @endif
                         </div>
@@ -504,7 +608,7 @@
                         <div class="profile-actions-row">
                             <button type="submit" class="profile-button">Save changes</button>
                             @if (session('status') === 'profile-updated')
-                                <div class="profile-status">Profile updated.</div>
+                                <div class="profile-status" role="status">Profile updated.</div>
                             @endif
                         </div>
                     </form>
@@ -522,35 +626,42 @@
                         <div class="profile-field">
                             <label for="current_password" class="profile-label">Current password</label>
                             <input id="current_password" name="current_password" type="password" class="profile-input"
-                                autocomplete="current-password">
+                                autocomplete="current-password"
+                                @if ($errors->updatePassword->get('current_password')) aria-invalid="true" aria-describedby="current_password-error" @endif>
                             @if ($errors->updatePassword->get('current_password'))
-                                <div class="profile-error">{{ $errors->updatePassword->first('current_password') }}</div>
+                                <div class="profile-error" id="current_password-error" role="alert">
+                                    {{ $errors->updatePassword->first('current_password') }}</div>
                             @endif
                         </div>
 
                         <div class="profile-field">
                             <label for="password" class="profile-label">New password</label>
                             <input id="password" name="password" type="password" class="profile-input"
-                                autocomplete="new-password">
+                                autocomplete="new-password"
+                                @if ($errors->updatePassword->get('password')) aria-invalid="true" aria-describedby="password-error" @endif>
                             @if ($errors->updatePassword->get('password'))
-                                <div class="profile-error">{{ $errors->updatePassword->first('password') }}</div>
+                                <div class="profile-error" id="password-error" role="alert">
+                                    {{ $errors->updatePassword->first('password') }}</div>
                             @endif
                         </div>
 
                         <div class="profile-field">
                             <label for="password_confirmation" class="profile-label">Confirm password</label>
                             <input id="password_confirmation" name="password_confirmation" type="password"
-                                class="profile-input" autocomplete="new-password">
+                                class="profile-input" autocomplete="new-password"
+                                @if ($errors->updatePassword->get('password_confirmation')) aria-invalid="true" aria-describedby="password_confirmation-error" @endif>
                             @if ($errors->updatePassword->get('password_confirmation'))
-                                <div class="profile-error">{{ $errors->updatePassword->first('password_confirmation') }}
+                                <div class="profile-error" id="password_confirmation-error" role="alert">
+                                    {{ $errors->updatePassword->first('password_confirmation') }}
                                 </div>
                             @endif
                         </div>
 
                         <div class="profile-actions-row">
-                            <button type="submit" class="profile-button">Update password</button>
+                            <button type="submit" class="profile-button profile-button-secondary">Update
+                                password</button>
                             @if (session('status') === 'password-updated')
-                                <div class="profile-status">Password updated.</div>
+                                <div class="profile-status" role="status">Password updated.</div>
                             @endif
                         </div>
                     </form>
@@ -571,9 +682,11 @@
                         <div class="profile-field">
                             <label for="delete_password" class="profile-label">Current password</label>
                             <input id="delete_password" name="password" type="password" class="profile-input"
-                                placeholder="Enter your password to confirm">
+                                placeholder="Enter your password to confirm"
+                                @if ($errors->userDeletion->get('password')) aria-invalid="true" aria-describedby="delete_password-error" @endif>
                             @if ($errors->userDeletion->get('password'))
-                                <div class="profile-error">{{ $errors->userDeletion->first('password') }}</div>
+                                <div class="profile-error" id="delete_password-error" role="alert">
+                                    {{ $errors->userDeletion->first('password') }}</div>
                             @endif
                         </div>
 
@@ -585,4 +698,44 @@
             </div>
         </div>
     </div>
+    <script>
+        (() => {
+            // Предпросмотр выбранного аватара до сохранения
+            const fileInput = document.getElementById('avatar');
+            const preview = document.querySelector('.profile-avatar-preview');
+            let previewUrl = null;
+
+            fileInput?.addEventListener('change', () => {
+                const file = fileInput.files && fileInput.files[0];
+                if (!file || !preview || !file.type.startsWith('image/')) return;
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+                previewUrl = URL.createObjectURL(file);
+                preview.style.backgroundImage = `url('${previewUrl}')`;
+            });
+
+            // После ошибки валидации сразу ставим фокус на первое проблемное поле
+            const firstInvalid = document.querySelector('[aria-invalid="true"]');
+            if (firstInvalid) {
+                firstInvalid.focus({
+                    preventScroll: true
+                });
+                firstInvalid.scrollIntoView({
+                    block: 'center'
+                });
+            }
+
+            // Защита от двойной отправки (формы с диалогом подтверждения не трогаем)
+            document.querySelectorAll('.profile-form:not([data-confirm])').forEach((form) => {
+                form.addEventListener('submit', () => {
+                    const button = form.querySelector('button[type="submit"]');
+                    if (button) button.setAttribute('aria-busy', 'true');
+                });
+            });
+
+            window.addEventListener('pageshow', () => {
+                document.querySelectorAll('[aria-busy="true"]').forEach((el) => el.removeAttribute(
+                'aria-busy'));
+            });
+        })();
+    </script>
 @endsection

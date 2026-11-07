@@ -95,11 +95,66 @@
             padding: 120px 20px;
         }
     }
+
+    .posts-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        max-width: 1440px;
+        margin: 0 auto 32px;
+    }
+
+    .posts-head-title {
+        margin: 0;
+        font-size: clamp(24px, 4vw, 36px);
+        color: var(--text-main);
+    }
+
+    .posts-head-link {
+        color: var(--text-main);
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        opacity: 0.85;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .posts-head-link:hover {
+        opacity: 1;
+        text-decoration: underline;
+        text-underline-offset: 6px;
+    }
+
+    .posts-head-link span {
+        display: inline-block;
+        transition: transform 0.25s ease;
+    }
+
+    .posts-head-link:hover span {
+        transform: translateX(4px);
+    }
 </style>
 
+@php
+    // Сколько постов показывать на главной
+    $homeLimit = 6;
+
+    $isHome = request()->routeIs('home');
+    $visiblePosts = $isHome ? $posts->take($homeLimit) : $posts;
+@endphp
+
 <section class="posts-section" id="home-posts">
+    @if ($isHome)
+        <div class="posts-head">
+            <h2 class="posts-head-title">Latest posts</h2>
+            <a href="{{ route('posts.index') }}" class="posts-head-link">See all <span aria-hidden="true">&rarr;</span></a>
+        </div>
+    @endif
+
     <div class="posts-container">
-        @foreach ($posts as $post)
+        @foreach ($visiblePosts as $post)
             <a href="{{ route('posts.show', $post->id) }}" class="post-card">
                 <div class="card">
                     @if ($post->image)

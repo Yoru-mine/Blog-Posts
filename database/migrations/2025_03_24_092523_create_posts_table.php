@@ -16,7 +16,11 @@ return new class extends Migration
                 $table->id();
                 $table->string('title');
                 $table->text('content');
+                $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('cascade');
                 $table->string('image')->nullable();
+                $table->unsignedInteger('views')->default(0);
+                $table->enum('visibility', ['public','private', 'friends'])->default('public');
+                $table->boolean('is_published')->default(false);
                 $table->timestamps();
             });
         }

@@ -20,7 +20,7 @@
         }
 
         .register-box {
-            background-color: #2D2D2D;
+            background-color: var(--surface-3);
             width: 560px;
             min-height: 760px;
             max-width: 100%;
@@ -35,6 +35,7 @@
             margin: 0 0 30px;
             font-weight: 700;
             letter-spacing: 0.01em;
+            text-shadow: var(--glow);
         }
 
         .register-field {
@@ -44,84 +45,113 @@
 
         .register-field label {
             display: block;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: #f4f4f4;
+            color: var(--text-main);
         }
 
+        /* поля без рамок: фон + свечение при наведении и фокусе */
         .register-field input {
             display: block;
             width: 424px;
             height: 56px;
             box-sizing: border-box;
-            background: #202020;
-            border: 1px solid transparent;
+            background: var(--surface-hover);
+            border: 0;
             outline: none;
-            box-shadow: none;
-            color: #F5F5F5;
+            color: var(--text-main);
+            caret-color: var(--accent);
             padding: 0 16px;
             font-size: 16px;
-            transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+            font-family: inherit;
+            transition: background-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .register-field input:hover {
+            background: rgba(var(--accent-rgb), 0.12);
         }
 
         .register-field input:focus {
             outline: none;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: none;
-            background: #202020;
+            background: rgba(var(--accent-rgb), 0.16);
+            box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.28), 0 0 26px rgba(var(--accent-rgb), 0.24);
+        }
+
+        .register-field input[aria-invalid="true"] {
+            background: rgba(var(--danger-rgb), 0.12);
+            box-shadow: 0 0 0 3px rgba(var(--danger-rgb), 0.3);
         }
 
         .register-field input:-webkit-autofill,
-        .register-field input:-webkit-autofill:hover,
+        .register-field input:-webkit-autofill:hover {
+            -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset !important;
+            -webkit-text-fill-color: var(--text-main) !important;
+            transition: background-color 9999s ease-in-out 0s;
+        }
+
         .register-field input:-webkit-autofill:focus,
         .register-field input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1000px #202020 inset !important;
-            -webkit-text-fill-color: #F5F5F5 !important;
+            -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset, 0 0 0 3px rgba(var(--accent-rgb), 0.28), 0 0 26px rgba(var(--accent-rgb), 0.24) !important;
+            -webkit-text-fill-color: var(--text-main) !important;
             transition: background-color 9999s ease-in-out 0s;
         }
 
         .register-error {
             margin-top: 8px;
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.5;
-            color: #eab1b1;
+            color: var(--danger);
         }
 
-        .register-login {
-            text-align: center;
-            margin-top: 34px;
-        }
-
-        .register-login a {
-            font-size: 16px;
-            color: white;
-            transition: opacity 0.2s ease;
-        }
-
-        .register-login a:hover {
-            opacity: 0.88;
-        }
-
+        /* главное действие экрана: единственная залитая кнопка */
         .register-button {
             display: block;
             margin: 32px auto 0;
             width: 260px;
-            height: 52px;
+            min-height: 52px;
             font-size: 18px;
             font-weight: 700;
             border: none;
-            background: #e9e9e9;
-            color: #1E1E1E;
+            background: var(--accent);
+            color: var(--accent-contrast);
             font-family: inherit;
             cursor: pointer;
-            box-shadow: 0 0 18px rgba(255, 255, 255, 0.18);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
         }
 
-        .register-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 22px rgba(255, 255, 255, 0.22);
+        .register-button:hover,
+        .register-button:focus-visible {
+            background: var(--accent-hover);
+        }
+
+        .register-button[aria-busy="true"] {
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .register-login {
+            display: flex;
+            justify-content: center;
+            margin-top: 22px;
+        }
+
+        .register-login a {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--btn-h);
+            padding: 0 14px;
+            font-size: 16px;
+            color: var(--text-main);
+            text-decoration: none;
+            text-shadow: var(--glow-faint);
+            transition: background-color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .register-login a:hover,
+        .register-login a:focus-visible {
+            background: var(--surface-soft);
+            text-shadow: var(--glow-hover);
         }
 
         @media (max-width: 640px) {
@@ -159,33 +189,50 @@
 
                 <div class="register-field">
                     <label for="name">Name</label>
-                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name">
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                        autocomplete="name" @error('name') aria-invalid="true" aria-describedby="name-error" @enderror>
                     @error('name')
-                        <div class="register-error">{{ $message }}</div>
+                        <div class="register-error" id="name-error" role="alert">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="register-field">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" value="{{ old('username') }}" required
+                        minlength="3" maxlength="30" pattern="[A-Za-z0-9_]{3,30}" autocomplete="nickname"
+                        autocapitalize="none"
+                        @error('username') aria-invalid="true" aria-describedby="username-error" @enderror>
+                    @error('username')
+                        <div class="register-error" id="username-error" role="alert">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="register-field">
                     <label for="email">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username">
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                        autocomplete="username"
+                        @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
                     @error('email')
-                        <div class="register-error">{{ $message }}</div>
+                        <div class="register-error" id="email-error" role="alert">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="register-field">
                     <label for="password">Password</label>
-                    <input id="password" type="password" name="password" required autocomplete="new-password">
+                    <input id="password" type="password" name="password" required autocomplete="new-password"
+                        @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
                     @error('password')
-                        <div class="register-error">{{ $message }}</div>
+                        <div class="register-error" id="password-error" role="alert">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="register-field">
                     <label for="password_confirmation">Confirm password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                    <input id="password_confirmation" type="password" name="password_confirmation" required
+                        autocomplete="new-password"
+                        @error('password_confirmation') aria-invalid="true" aria-describedby="password_confirmation-error" @enderror>
                     @error('password_confirmation')
-                        <div class="register-error">{{ $message }}</div>
+                        <div class="register-error" id="password_confirmation-error" role="alert">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -199,4 +246,20 @@
             </form>
         </div>
     </div>
+
+    <script>
+        (() => {
+            const form = document.querySelector('.register-box form');
+            const firstInvalid = document.querySelector('[aria-invalid="true"]');
+            if (firstInvalid) firstInvalid.focus();
+
+            // защита от двойной отправки
+            form?.addEventListener('submit', () => {
+                form.querySelector('button[type="submit"]')?.setAttribute('aria-busy', 'true');
+            });
+            window.addEventListener('pageshow', () => {
+                form?.querySelector('button[type="submit"]')?.removeAttribute('aria-busy');
+            });
+        })();
+    </script>
 @endsection

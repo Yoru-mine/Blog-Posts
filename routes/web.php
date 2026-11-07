@@ -1,77 +1,66 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\FollowingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Models\Comment;
 use App\Models\Post;
 
-try {
-    Artisan::call('migrate', ['--force' => true]);
-} catch (\Exception $e) {
-}
-
-Route::get('/create-admin-secretly', function () {
-    $email = 'myavk22@gmail.com';
-
-    $adminExists = User::where('email', $email)->exists();
-
-    if (!$adminExists) {
-        User::create([
-            'name' => 'Admin',
-            'email' => $email,
-            'password' => Hash::make('AdminNimda12345'),
-        ]);
-        return 'Администратор myavk22@gmail.com успешно создан! Теперь можно входить.';
-    }
-
-    return 'Пользователь с email myavk22@gmail.com уже существует в базе Aiven.';
-});
 
 
 
 Route::get('/', function () {
-    $user = \App\Models\User::where('email', 'myavk22@gmail.com')->first();
-    if ($user && !$user->is_admin) {
-        $user->is_admin = true;
-        $user->save();
-    }
-
-    $posts = \App\Models\Post::latest()->take(8)->get();
-
+    $posts = \App\Models\Post::where('is_published', true)->where('visibility', 'public')->latest()->take(8)->get();
     return view('home', compact('posts'));
 })->name('home');
 
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contacts', [ContactController::class, 'index'])->name('contacts');
+Route::get('/users/search', [UserController::class, 'searchUsers'])->middleware('throttle:30,1')->name('users.search');
 Route::get('/users/{user}', [ProfileController::class, 'show'])->name('users.show');
-
-Route::get('/comments/{comment}/int', [CommentController::class, 'commentInt'])->name('comments.int');
 
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    $recentPosts = $user ? $user->posts()->latest()->take(3)->get() : collect();
+    $recentPosts = $user ? $user->posts()->where('is_published', true)->latest()->take(3)->get() : collect();
     $stats = [
-        'posts_count' => $user ? $user->posts()->count() : 0,
-        'comments_count' => $user ? $user->posts()->withCount('comments')->get()->sum('comments_count') : 0,
+        'posts_count' => $user ? $user->posts()->where('is_published', true)->count() : 0,
+        'comments_count' => $user ? $user->posts()->where('is_published', true)->withCount('comments')->get()->sum('comments_count') : 0,
         'latest_post' => $recentPosts->first(),
     ];
 
     return view('dashboard', compact('user', 'recentPosts', 'stats'));
 })->middleware(['auth'])->name('dashboard');
 
+
+
 Route::middleware('auth')->group(function () {
+    Route::post('/posts/draft', [PostController::class, 'saveDraft'])
+        ->middleware('throttle:60,1')
+        ->name('posts.saveDraft');
+
+    Route::patch('/posts/draft/{id}', [PostController::class, 'updateDraft'])
+        ->middleware('throttle:60,1')
+        ->name('posts.updateDraft');
+
+    Route::get('/posts/drafts', [PostController::class, 'drafts'])->name('posts.drafts');
+    Route::patch('/posts/{id}/publish', [PostController::class, 'publish'])->name('posts.publish');
+    Route::post('/users/{user}/following', [FollowingController::class, 'store'])->middleware('throttle:30,1')->name('users.follow');
+    Route::delete('/users/{user}/following', [FollowingController::class, 'destroy'])->middleware('throttle:30,1')->name('users.unfollow');
+    Route::get('/users/{user}', [ProfileController::class, 'show'])->name('profile.show');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroyAvatar');
     Route::get('/admin-panel', function () {
         $stats = [
             'posts' => Post::count(),
@@ -117,18 +106,16 @@ Route::middleware('auth')->group(function () {
     })->middleware('admin')->name('admin.users.toggle-admin');
 
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
+    Route::post('/posts', [PostController::class, 'store'])->middleware('throttle:10,1')->name('posts.store');
+    Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->middleware('throttle:60,1')->name('posts.like');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-    Route::get('/posts/{post}/comments', [CommentController::class, 'postComment'])->name('posts.comments');
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->middleware('throttle:20,1')->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    Route::post('/upload', [FileUploadController::class, 'store'])->name('upload.file');
+    Route::post('/upload', [FileUploadController::class, 'store'])->middleware('throttle:20,1')->name('upload.file');
 });
 
-Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
+Route::get('/posts/search', [PostController::class, 'search'])->middleware('throttle:30,1')->name('posts.search');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
-
 require __DIR__ . '/auth.php';

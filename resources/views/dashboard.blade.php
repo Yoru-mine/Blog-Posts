@@ -3,15 +3,29 @@
 @section('title', 'Dashboard')
 
 @section('content')
+    @php
+        $hasDraftStatus = \Illuminate\Support\Facades\Schema::hasColumn('posts', 'is_published');
+        $draftsCount = $hasDraftStatus
+            ? \Illuminate\Support\Facades\DB::table('posts')
+                ->where('user_id', auth()->id())
+                ->where('is_published', false)
+                ->count()
+            : 0;
+        $recentDrafts =
+            $draftsCount > 0
+                ? \Illuminate\Support\Facades\DB::table('posts')
+                    ->where('user_id', auth()->id())
+                    ->where('is_published', false)
+                    ->orderByDesc('updated_at')
+                    ->limit(3)
+                    ->get(['id', 'title', 'content', 'image', 'updated_at'])
+                : collect();
+    @endphp
     <style>
         .dashboard-page {
             position: relative;
             min-height: 100vh;
             padding: 130px 24px 72px;
-            background:
-                radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 24%),
-                radial-gradient(circle at top right, rgba(255, 220, 220, 0.08), transparent 20%),
-                linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%);
         }
 
         .dashboard-backdrop {
@@ -20,9 +34,9 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            filter: blur(30px) brightness(0.4);
+            filter: blur(30px) brightness(0.4) saturate(0.7);
             transform: scale(1.1);
-            opacity: 0.5;
+            opacity: 0.45;
             z-index: 0;
         }
 
@@ -36,10 +50,7 @@
         }
 
         .dashboard-hero {
-            background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
-                rgba(26, 26, 26, 0.56);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-2);
             box-shadow: var(--shadow-soft);
             padding: 42px 44px;
             display: grid;
@@ -47,66 +58,66 @@
             gap: 28px;
         }
 
-        .dashboard-kicker {
-            display: inline-block;
-            font-size: 12px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.58);
-            margin-bottom: 18px;
-        }
-
         .dashboard-title {
             font-size: 56px;
             line-height: 1.02;
             margin: 0 0 16px;
             text-wrap: balance;
+            text-shadow: var(--glow);
         }
 
         .dashboard-copy {
             max-width: 700px;
             font-size: 18px;
             line-height: 1.8;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-muted);
             margin: 0;
         }
 
         .dashboard-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 14px;
+            gap: 12px;
             margin-top: 34px;
         }
 
+        /* единая кнопка: размер и hover одинаковы, различается только цвет */
         .dashboard-action,
-        .dashboard-action-secondary {
+        .dashboard-action-secondary,
+        .recent-post-actions a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
             min-width: 170px;
-            min-height: 54px;
-            padding: 0 22px;
+            min-height: var(--btn-h);
+            padding: var(--btn-pad);
             text-decoration: none;
             font-size: 15px;
             font-weight: 600;
-            transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+            white-space: nowrap;
+            color: var(--text-main);
+            background: var(--surface-soft);
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
+        .dashboard-action-secondary:hover,
+        .dashboard-action-secondary:focus-visible,
+        .recent-post-actions a:hover,
+        .recent-post-actions a:focus-visible {
+            background: var(--surface-hover);
+        }
+
+        /* главное действие экрана: создать пост */
         .dashboard-action {
-            background: #f2ede2;
-            color: #1E1E1E;
-        }
-
-        .dashboard-action-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: #f4f4f4;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--accent-contrast);
+            background: var(--accent);
+            font-weight: 700;
         }
 
         .dashboard-action:hover,
-        .dashboard-action-secondary:hover {
-            transform: translateY(-1px);
-            opacity: 0.96;
+        .dashboard-action:focus-visible {
+            background: var(--accent-hover);
         }
 
         .dashboard-stats {
@@ -117,27 +128,27 @@
         }
 
         .dashboard-stat {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-3);
             padding: 22px 20px;
             min-height: 138px;
         }
 
         .dashboard-stat-label {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.58);
-            margin-bottom: 18px;
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
         }
 
         .dashboard-stat-value {
             font-size: 40px;
             line-height: 1;
             margin: 0 0 10px;
+            text-shadow: var(--glow);
         }
 
         .dashboard-stat-note {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            color: var(--text-muted);
             line-height: 1.5;
         }
 
@@ -148,8 +159,7 @@
         }
 
         .dashboard-panel {
-            background: rgba(30, 30, 30, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-2);
             box-shadow: var(--shadow-soft);
             padding: 30px;
         }
@@ -157,28 +167,33 @@
         .panel-title {
             font-size: 28px;
             margin: 0 0 10px;
+            text-shadow: var(--glow);
         }
 
         .panel-subtitle {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            color: var(--text-muted);
             margin: 0 0 26px;
             line-height: 1.7;
         }
 
         .recent-posts {
             display: grid;
-            gap: 16px;
+            gap: 14px;
         }
 
         .recent-post {
             display: grid;
             grid-template-columns: 120px 1fr auto;
             gap: 18px;
-            align-items: stretch;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            align-items: center;
+            background: var(--surface-3);
             padding: 16px;
+            transition: background-color 0.2s ease;
+        }
+
+        .recent-post:hover {
+            background: var(--surface-hover);
         }
 
         .recent-post-image {
@@ -186,24 +201,26 @@
             height: 96px;
             object-fit: cover;
             display: block;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--surface-soft);
+            filter: saturate(0.8);
         }
 
         .recent-post-content h3 {
             font-size: 20px;
             margin: 0 0 10px;
+            text-shadow: var(--glow);
         }
 
         .recent-post-content p {
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.7;
-            color: rgba(255, 255, 255, 0.76);
+            color: var(--text-muted);
             margin: 0 0 10px;
         }
 
         .recent-post-meta {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.52);
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
         .recent-post-actions {
@@ -212,33 +229,22 @@
         }
 
         .recent-post-actions a {
-            color: #f4f4f4;
-            text-decoration: none;
-            font-size: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 11px 14px;
-            white-space: nowrap;
-        }
-
-        .recent-post-actions a:hover {
-            background: rgba(255, 255, 255, 0.08);
+            min-width: 0;
         }
 
         .empty-state {
-            min-height: 240px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 18px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-3);
             padding: 28px;
         }
 
         .empty-state p {
             font-size: 16px;
             line-height: 1.7;
-            color: rgba(255, 255, 255, 0.72);
+            color: var(--text-muted);
             margin: 0;
             max-width: 500px;
         }
@@ -252,27 +258,92 @@
             display: block;
             text-decoration: none;
             color: inherit;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--surface-3);
             padding: 20px;
-            transition: transform 0.2s ease, background 0.2s ease;
+            transition: background-color 0.2s ease;
         }
 
-        .dashboard-link-card:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, 0.06);
+        .dashboard-link-card:hover,
+        .dashboard-link-card:focus-visible {
+            background: var(--surface-hover);
         }
 
         .dashboard-link-card h3 {
             font-size: 18px;
             margin: 0 0 10px;
+            text-shadow: var(--glow);
+            transition: text-shadow 0.2s ease;
+        }
+
+        .dashboard-link-card:hover h3 {
+            text-shadow: var(--glow-hover);
         }
 
         .dashboard-link-card p {
             margin: 0;
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.7;
-            color: rgba(255, 255, 255, 0.72);
+            color: var(--text-muted);
+        }
+
+        .dashboard-draft-badge {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 2px 10px;
+            font-size: 14px;
+            font-weight: 700;
+            vertical-align: middle;
+            color: var(--accent-contrast);
+            background: var(--accent);
+            text-shadow: none;
+        }
+
+        .dashboard-action-count {
+            padding: 1px 9px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-contrast);
+            background: var(--accent);
+        }
+
+        /* блок черновиков отделён фоном и отступом, без линии */
+        .dashboard-drafts {
+            margin-top: 34px;
+            padding: 24px;
+            background: var(--surface);
+        }
+
+        .dashboard-drafts-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .dashboard-drafts-head h2 {
+            margin: 0;
+            font-size: 22px;
+            text-shadow: var(--glow);
+        }
+
+        .dashboard-drafts-head a {
+            display: inline-flex;
+            align-items: center;
+            min-height: var(--btn-h);
+            padding: 0 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            text-shadow: var(--glow);
+            transition: background-color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .dashboard-drafts-head a:hover,
+        .dashboard-drafts-head a:focus-visible {
+            background: var(--surface-soft);
+            text-shadow: var(--glow-hover);
         }
 
         @media (max-width: 1100px) {
@@ -319,7 +390,8 @@
             }
 
             .dashboard-action,
-            .dashboard-action-secondary {
+            .dashboard-action-secondary,
+            .recent-post-actions a {
                 width: 100%;
             }
         }
@@ -332,7 +404,6 @@
         <div class="dashboard-shell">
             <section class="dashboard-hero">
                 <div>
-                    <span class="dashboard-kicker">Personal dashboard</span>
                     <h1 class="dashboard-title">Welcome back, {{ $user?->name ?? 'writer' }}</h1>
                     <p class="dashboard-copy">
                         This is your private workspace. From here you can create a new post, adjust your profile, and
@@ -342,6 +413,14 @@
                     <div class="dashboard-actions">
                         <a href="{{ route('posts.create') }}" class="dashboard-action">Create a new post</a>
                         <a href="{{ route('profile.edit') }}" class="dashboard-action-secondary">Edit profile</a>
+                        @if (\Illuminate\Support\Facades\Route::has('posts.drafts'))
+                            <a href="{{ route('posts.drafts') }}" class="dashboard-action-secondary">
+                                Drafts
+                                @if ($draftsCount > 0)
+                                    <span class="dashboard-action-count">{{ $draftsCount }}</span>
+                                @endif
+                            </a>
+                        @endif
                     </div>
                 </div>
 
@@ -369,9 +448,9 @@
                     </div>
 
                     <div class="dashboard-stat">
-                        <div class="dashboard-stat-label">Quick focus</div>
-                        <p class="dashboard-stat-value">{{ $recentPosts->count() }}</p>
-                        <div class="dashboard-stat-note">Recent posts displayed below for fast editing and review.</div>
+                        <div class="dashboard-stat-label">Drafts</div>
+                        <p class="dashboard-stat-value">{{ $draftsCount }}</p>
+                        <div class="dashboard-stat-note">Unfinished posts saved only for you.</div>
                     </div>
                 </div>
             </section>
@@ -386,7 +465,6 @@
                         <div class="empty-state">
                             <p>You don't have any posts linked to your account yet. Create one and it will appear here
                                 automatically.</p>
-                            <a href="{{ route('posts.create') }}" class="dashboard-action">Create first post</a>
                         </div>
                     @else
                         <div class="recent-posts">
@@ -396,7 +474,12 @@
                                         class="recent-post-image">
 
                                     <div class="recent-post-content">
-                                        <h3>{{ $post->title }}</h3>
+                                        <h3>
+                                            {{ $post->title }}
+                                            @if ($post->is_published !== null && !$post->is_published)
+                                                <span class="dashboard-draft-badge">Draft</span>
+                                            @endif
+                                        </h3>
                                         <p>{{ \Illuminate\Support\Str::limit($post->content, 120) }}</p>
                                         <div class="recent-post-meta">Updated {{ $post->updated_at->diffForHumans() }}
                                         </div>
@@ -407,6 +490,42 @@
                                     </div>
                                 </article>
                             @endforeach
+                        </div>
+                    @endif
+
+                    @if ($draftsCount > 0)
+                        <div class="dashboard-drafts">
+                            <div class="dashboard-drafts-head">
+                                <h2>Your drafts</h2>
+                                @if (\Illuminate\Support\Facades\Route::has('posts.drafts'))
+                                    <a href="{{ route('posts.drafts') }}">View all {{ $draftsCount }}</a>
+                                @endif
+                            </div>
+
+                            <div class="recent-posts">
+                                @foreach ($recentDrafts as $draft)
+                                    <article class="recent-post">
+                                        <img src="{{ $draft->image ?: asset('images/default.png') }}" alt=""
+                                            class="recent-post-image">
+
+                                        <div class="recent-post-content">
+                                            <h3>
+                                                {{ trim((string) $draft->title) !== '' ? $draft->title : 'Untitled draft' }}
+                                                <span class="dashboard-draft-badge">Draft</span>
+                                            </h3>
+                                            <p>{{ trim((string) $draft->content) !== '' ? \Illuminate\Support\Str::limit(strip_tags($draft->content), 120) : 'No text yet.' }}
+                                            </p>
+                                            <div class="recent-post-meta">Edited
+                                                {{ \Illuminate\Support\Carbon::parse($draft->updated_at)->diffForHumans() }}
+                                            </div>
+                                        </div>
+
+                                        <div class="recent-post-actions">
+                                            <a href="{{ route('posts.edit', $draft->id) }}">Continue editing</a>
+                                        </div>
+                                    </article>
+                                @endforeach
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -427,10 +546,6 @@
                             <p>Review the full feed and open any post to check comments, likes, and views.</p>
                         </a>
 
-                        <a href="{{ route('profile.edit') }}" class="dashboard-link-card">
-                            <h3>Profile settings</h3>
-                            <p>Update your name, password, and other account information.</p>
-                        </a>
                     </div>
                 </aside>
             </section>
